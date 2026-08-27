@@ -1,4 +1,4 @@
-import { timingSafeEqual } from "node:crypto";
+import { createHash, timingSafeEqual } from "node:crypto";
 
 export type HeaderSource = Headers | Record<string, string | string[] | number | undefined>;
 
@@ -20,12 +20,15 @@ export function bearerToken(headers: HeaderSource): string | null {
   return match ? match[1]!.trim() : null;
 }
 
-/** Constant-time string comparison (length-leaking only). */
+/**
+ * Constant-time string comparison. Both inputs are hashed to fixed-size digests
+ * BEFORE the timing-sensitive comparison, so the runtime is independent of the
+ * inputs' lengths (closes the length side-channel that a raw length check leaks).
+ */
 export function safeEqual(a: string, b: string): boolean {
-  const ba = Buffer.from(a);
-  const bb = Buffer.from(b);
-  if (ba.length !== bb.length) return false;
-  return timingSafeEqual(ba, bb);
+  const da = createHash("sha256").update(a).digest();
+  const db = createHash("sha256").update(b).digest();
+  return timingSafeEqual(da, db);
 }
 
 /**

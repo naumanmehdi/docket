@@ -46,6 +46,16 @@ describe("validateListing", () => {
     expect(r.ok).toBe(false);
   });
 
+  it("rejects a URL with embedded credentials", () => {
+    const r = validateListing({ ...base, url: "https://user:pass@example.com" });
+    expect(r.ok).toBe(false);
+  });
+
+  it("rejects an over-long URL", () => {
+    const r = validateListing({ ...base, url: `https://example.com/${"a".repeat(2100)}` });
+    expect(r.ok).toBe(false);
+  });
+
   it("rejects a missing category", () => {
     const r = validateListing({ ...base, category: "" });
     expect(r.ok).toBe(false);

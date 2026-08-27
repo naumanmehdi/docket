@@ -18,6 +18,7 @@ const NAME_MAX = 80;
 const TAGLINE_MAX = 140;
 const CATEGORY_MAX = 60;
 const HANDLE_MAX = 50;
+const URL_MAX = 2048;
 
 function clean(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
@@ -38,6 +39,7 @@ export function validateListing(raw: unknown): Validation {
 
   let urlValue = "";
   if (!url) errors.push("url is required");
+  else if (url.length > URL_MAX) errors.push(`url must be ${URL_MAX} characters or fewer`);
   else {
     let parsed: URL | null = null;
     try {
@@ -48,6 +50,8 @@ export function validateListing(raw: unknown): Validation {
     if (!parsed || !parsed.hostname) errors.push("url must be a valid web address");
     else if (parsed.protocol !== "http:" && parsed.protocol !== "https:")
       errors.push("url must be http(s)");
+    else if (parsed.username || parsed.password)
+      errors.push("url must not contain embedded credentials");
     else urlValue = url;
   }
 

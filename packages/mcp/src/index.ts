@@ -53,7 +53,7 @@ export async function startServer(options: StartServerOptions): Promise<RunningS
     }
   });
 
-  await new Promise<void>((resolve) => httpServer.listen(options.port ?? 0, resolve));
+  await new Promise<void>((resolve) => httpServer.listen(options.port ?? 0, "127.0.0.1", resolve));
 
   const address = httpServer.address();
   const port = typeof address === "object" && address ? address.port : options.port;
