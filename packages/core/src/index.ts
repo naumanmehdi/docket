@@ -3,6 +3,8 @@ export type { Brand } from "./brand.js";
 export { loadConfig } from "./config.js";
 export type { Config } from "./config.js";
 export { createPool } from "./db.js";
+export { RateLimiter, KeyedRateLimiters } from "./ratelimit.js";
+export type { RateLimitResult } from "./ratelimit.js";
 export {
   KINDS,
   validateListing,
