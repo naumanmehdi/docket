@@ -130,3 +130,46 @@ footer .tagline { font-family: "Fraunces", serif; font-size: 15px; color: var(--
   .step, .bcard { transition: transform 0.25s ease, box-shadow 0.25s ease; }
   .step:hover, .bcard:hover { transform: translateY(-2px); box-shadow: 0 18px 40px -24px rgba(36, 30, 22, 0.35); }
 }
+
+/* ---------- kinds row ---------- */
+.kinds { margin-top: 26px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+@media (max-width: 820px) { .kinds { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 500px) { .kinds { grid-template-columns: 1fr; } }
+.kind { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 18px; }
+.kind .kicon { font-size: 26px; }
+.kind h3 { font-size: 16px; font-weight: 700; margin-top: 10px; }
+.kind p { font-size: 13.5px; color: var(--mut); margin-top: 6px; line-height: 1.5; }
+
+/* ---------- spotlight ---------- */
+.spotlight { margin-top: 56px; }
+.spot-cards { margin-top: 18px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.spot { display: flex; align-items: center; gap: 12px; background: linear-gradient(135deg, #fff, #f6efe3); border: 1px solid var(--gold-soft); border-radius: 14px; padding: 13px 14px; text-decoration: none; color: inherit; }
+.spot .logo { width: 40px; height: 40px; border-radius: 10px; color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.spot b { font-size: 14.5px; display: block; }
+.spot span { font-size: 12.5px; color: var(--mut); display: block; }
+.spot .kind2 { margin-left: auto; background: var(--gold-soft); color: var(--gold); flex-shrink: 0; }
+
+/* ---------- board toolbar ---------- */
+.board-wrap { margin-top: 6px; }
+.board-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tab { font: 600 13px "DM Sans"; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--mut); cursor: pointer; }
+.tab.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+.search { flex: 1; min-width: 180px; max-width: 280px; font: 14px "DM Sans"; padding: 9px 13px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--ink); }
+.search:focus { outline: none; border-color: var(--accent); }
+.board-stats { margin-top: 14px; font-size: 12.5px; color: var(--mut); }
+.board-stats b { color: var(--teal); }
+
+/* ---------- kind chip inside card title ---------- */
+.bcard .info b { display: flex; align-items: center; gap: 8px; }
+.kindchip { font-size: 10px; font-weight: 700; color: var(--mut); background: var(--paper); border: 1px solid var(--line); padding: 2px 7px; border-radius: 999px; letter-spacing: 0.03em; }
+.chip.author { background: var(--paper); color: var(--mut); border: 1px solid var(--line); }
+.chip.state.open { background: var(--teal-soft); color: var(--teal); }
+.chip.state.claimed { background: var(--gold-soft); color: var(--gold); }
+.chip.state.prog { background: #eef1ff; color: #3a5bd9; }
+.chip.state.built { background: var(--teal-soft); color: #0d5b49; }
+@media (max-width: 640px) { .bcard .meta { display: none; } }
+
+/* ---------- form select / textarea ---------- */
+.field select, .field textarea { width: 100%; font: 15px "DM Sans"; padding: 11px 13px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); color: var(--ink); }
+.field select:focus, .field textarea:focus { outline: none; border-color: var(--accent); background: #fff; }

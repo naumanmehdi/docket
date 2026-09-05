@@ -1,8 +1,21 @@
+// Validation for the agent-first catalog (SPEC §6). Single source of truth for
+// listing rules — shared by the MCP server, the web form, and the data layer.
+
+export type Kind = "idea" | "app" | "mcp" | "skill";
+
+export const KINDS: Kind[] = ["idea", "app", "mcp", "skill"];
+
 export interface ListingInput {
+  kind: Kind;
   name: string;
-  url: string;
   tagline: string;
-  category: string;
+  description?: string | null;
+  /** Required for app/mcp/skill; optional for idea (an unbuilt thought). */
+  url?: string | null;
+  repo_url?: string | null;
+  category?: string | null;
+  author: string;
+  author_contact?: string | null;
   x_handle?: string | null;
 }
 
@@ -10,79 +23,117 @@ export type Validation =
   | { ok: true; value: ListingInput }
   | { ok: false; errors: string[] };
 
-export type EmailResult =
-  | { ok: true; value: string }
-  | { ok: false; errors: string[] };
-
 const NAME_MAX = 80;
 const TAGLINE_MAX = 140;
 const CATEGORY_MAX = 60;
 const HANDLE_MAX = 50;
 const URL_MAX = 2048;
+const DESC_MAX = 2000;
 
 function clean(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
+}
+
+/** Returns true when the kind is a "built" artifact that needs a resolvable URL. */
+export function kindNeedsUrl(kind: Kind): boolean {
+  return kind === "app" || kind === "mcp" || kind === "skill";
+}
+
+/** Validates a plain http(s) URL; returns the normalized url or "" when invalid. */
+function validHttpUrl(value: string): string {
+  if (!value) return "";
+  if (value.length > URL_MAX) return "";
+  try {
+    const parsed = new URL(value);
+    if (!parsed.hostname) return "";
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return "";
+    if (parsed.username || parsed.password) return "";
+    return value;
+  } catch {
+    return "";
+  }
+}
+
+/** Validates + normalizes an identity handle (X/GitHub style) or returns "" when empty. */
+export function validHandle(value: string): string {
+  const stripped = value.replace(/^@/, "");
+  return /^[A-Za-z0-9_]{1,50}$/.test(stripped) ? stripped : "";
 }
 
 export function validateListing(raw: unknown): Validation {
   const errors: string[] = [];
   const o = (raw ?? {}) as Record<string, unknown>;
 
+  const kindRaw = clean(o.kind);
+  const kind: Kind = (KINDS as string[]).includes(kindRaw) ? (kindRaw as Kind) : "idea";
+  if (!kindRaw) errors.push("kind is required (idea, app, mcp or skill)");
+  else if (!(KINDS as string[]).includes(kindRaw))
+    errors.push("kind must be one of: idea, app, mcp, skill");
+
   const name = clean(o.name);
-  const url = clean(o.url);
   const tagline = clean(o.tagline);
-  const category = clean(o.category);
+  const description = clean(o.description) || null;
+  const url = clean(o.url);
+  const repoUrl = clean(o.repo_url) || null;
+  const category = clean(o.category) || null;
+  const authorRaw = clean(o.author);
+  const authorContact = clean(o.author_contact) || null;
   const xHandleRaw = clean(o.x_handle);
 
   if (!name) errors.push("name is required");
   else if (name.length > NAME_MAX) errors.push(`name must be ${NAME_MAX} characters or fewer`);
 
-  let urlValue = "";
-  if (!url) errors.push("url is required");
-  else if (url.length > URL_MAX) errors.push(`url must be ${URL_MAX} characters or fewer`);
-  else {
-    let parsed: URL | null = null;
-    try {
-      parsed = new URL(url);
-    } catch {
-      parsed = null;
-    }
-    if (!parsed || !parsed.hostname) errors.push("url must be a valid web address");
-    else if (parsed.protocol !== "http:" && parsed.protocol !== "https:")
-      errors.push("url must be http(s)");
-    else if (parsed.username || parsed.password)
-      errors.push("url must not contain embedded credentials");
-    else urlValue = url;
-  }
-
   if (!tagline) errors.push("tagline is required");
   else if (tagline.length > TAGLINE_MAX)
     errors.push(`tagline must be ${TAGLINE_MAX} characters or fewer`);
 
-  if (!category) errors.push("category is required");
-  else if (category.length > CATEGORY_MAX)
+  if (description && description.length > DESC_MAX)
+    errors.push(`description must be ${DESC_MAX} characters or fewer`);
+
+  let urlValue: string | null = null;
+  if (kindNeedsUrl(kind)) {
+    if (!url) errors.push("url is required for an app, mcp or skill");
+    else {
+      urlValue = validHttpUrl(url);
+      if (!urlValue) errors.push("url must be a valid http(s) address");
+    }
+  } else if (url) {
+    urlValue = validHttpUrl(url);
+    if (!urlValue) errors.push("url must be a valid http(s) address");
+  }
+
+  if (repoUrl) {
+    if (validHttpUrl(repoUrl) === "") errors.push("repo_url must be a valid http(s) address");
+  }
+
+  if (category && category.length > CATEGORY_MAX)
     errors.push(`category must be ${CATEGORY_MAX} characters or fewer`);
+
+  if (!authorRaw) errors.push("author is required (a handle so the listing has an owner)");
+  else if (authorRaw.length > HANDLE_MAX)
+    errors.push(`author must be ${HANDLE_MAX} characters or fewer`);
 
   let xHandle: string | null = null;
   if (xHandleRaw) {
-    const stripped = xHandleRaw.replace(/^@/, "");
-    if (!/^[A-Za-z0-9_]{1,50}$/.test(stripped))
-      errors.push(`x_handle must be letters, numbers or underscores (max ${HANDLE_MAX})`);
-    else xHandle = stripped;
+    const h = validHandle(xHandleRaw);
+    if (!h) errors.push(`x_handle must be letters, numbers or underscores (max ${HANDLE_MAX})`);
+    else xHandle = h;
   }
 
   if (errors.length > 0) return { ok: false, errors };
   return {
     ok: true,
-    value: { name, url: urlValue, tagline, category, x_handle: xHandle },
+    value: {
+      kind,
+      name,
+      tagline,
+      description,
+      url: urlValue,
+      repo_url: repoUrl,
+      category,
+      author: authorRaw,
+      author_contact: authorContact,
+      x_handle: xHandle,
+    },
   };
-}
-
-export function validateEmail(raw: unknown): EmailResult {
-  const email = clean(raw).toLowerCase();
-  if (!email) return { ok: false, errors: ["email is required"] };
-  if (email.length > 254) return { ok: false, errors: ["email is too long"] };
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-    return { ok: false, errors: ["email is invalid"] };
-  return { ok: true, value: email };
 }

@@ -3,7 +3,20 @@ export type { Brand } from "./brand.js";
 export { loadConfig } from "./config.js";
 export type { Config } from "./config.js";
 export { createPool } from "./db.js";
-export { validateListing, validateEmail } from "./validate.js";
-export type { ListingInput, Validation, EmailResult } from "./validate.js";
-export { createStore } from "./listings.js";
-export type { Store, Listing, Subscriber } from "./listings.js";
+export {
+  KINDS,
+  validateListing,
+  validHandle,
+  kindNeedsUrl,
+} from "./validate.js";
+export type { Kind, ListingInput, Validation } from "./validate.js";
+export { createStore, ACTIVE_CLAIM_CAP } from "./listings.js";
+export type {
+  Store,
+  Listing,
+  ListingStatus,
+  ClaimState,
+  ClaimLog,
+  ClaimResult,
+  SearchOptions,
+} from "./listings.js";

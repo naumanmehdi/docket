@@ -24,9 +24,12 @@ export async function POST(request: Request) {
         ok: true,
         listing: {
           id: listing.id,
+          kind: listing.kind,
           name: listing.name,
           status: listing.status,
           url: listing.url,
+          author: listing.author,
+          claim_state: listing.claim_state,
           created_at: listing.created_at.toISOString(),
         },
       },

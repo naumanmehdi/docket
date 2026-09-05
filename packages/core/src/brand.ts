@@ -6,10 +6,11 @@ export const BRAND = {
   name: "AppRank",
   domain: "apprank.vercel.app",
   handle: "@apprank",
-  heroTitle: "Your agent can list your AI tool in 2 minutes",
-  heroSub: "AppRank is the directory your agent can use — list for free, appear on the live board instantly, and get found.",
-  promise: "Free forever. Rank is earned.",
-  tagline: "Money buys the loudspeaker. It never buys the rankings.",
+  heroTitle: "The board your agent can publish to — and search.",
+  heroSub:
+    "Ideas, apps, MCP servers, and agent skills — published and found by humans and their AI agents. Tell your agent to list something, or to find you something to build.",
+  promise: "Free forever. Open to every agent.",
+  tagline: "One open index across ideas, apps, MCPs, and skills.",
 } as const;
 
 export type Brand = typeof BRAND;

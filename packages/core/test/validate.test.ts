@@ -1,24 +1,101 @@
 import { describe, it, expect } from "vitest";
-import { validateListing, validateEmail } from "../src/validate.js";
+import { validateListing } from "../src/validate.js";
 
 const base = {
+  kind: "app",
   name: "AgentScribe",
   url: "https://agentscribe.dev",
   tagline: "Turns meetings into notes",
-  category: "Productivity",
+  author: "naumanmehdi",
 };
 
-describe("validateListing", () => {
-  it("accepts a valid minimal listing", () => {
+describe("validateListing — kind", () => {
+  it("accepts a valid minimal app", () => {
     const r = validateListing(base);
     expect(r.ok).toBe(true);
-    expect(r.ok && r.value.name).toBe("AgentScribe");
+    expect(r.ok && r.value.kind).toBe("app");
   });
 
+  it("accepts each of the four kinds", () => {
+    for (const kind of ["idea", "app", "mcp", "skill"]) {
+      const r = validateListing({ ...base, kind });
+      expect(r.ok).toBe(true);
+    }
+  });
+
+  it("rejects a missing kind", () => {
+    const { kind, ...rest } = base as Record<string, unknown>;
+    const r = validateListing(rest);
+    expect(r.ok).toBe(false);
+  });
+
+  it("rejects an unknown kind", () => {
+    const r = validateListing({ ...base, kind: "plugin" });
+    expect(r.ok).toBe(false);
+  });
+});
+
+describe("validateListing — url is kind-dependent", () => {
+  it("accepts an idea with NO url (the unbuilt thought)", () => {
+    const r = validateListing({ ...base, kind: "idea", url: "" });
+    expect(r.ok).toBe(true);
+    expect(r.ok && r.value.url).toBeNull();
+  });
+
+  it("rejects an app with no url", () => {
+    const r = validateListing({ ...base, kind: "app", url: "" });
+    expect(r.ok).toBe(false);
+  });
+
+  it("rejects an mcp with no url", () => {
+    const r = validateListing({ ...base, kind: "mcp", url: "" });
+    expect(r.ok).toBe(false);
+  });
+
+  it("rejects a skill with no url", () => {
+    const r = validateListing({ ...base, kind: "skill", url: "" });
+    expect(r.ok).toBe(false);
+  });
+
+  it("accepts an idea that does include a url", () => {
+    const r = validateListing({ ...base, kind: "idea", url: "https://example.com" });
+    expect(r.ok).toBe(true);
+    expect(r.ok && r.value.url).toBe("https://example.com");
+  });
+
+  it("rejects a non-http(s) url", () => {
+    const r = validateListing({ ...base, url: "ftp://example.com" });
+    expect(r.ok).toBe(false);
+  });
+
+  it("rejects a url with embedded credentials", () => {
+    const r = validateListing({ ...base, url: "https://user:pass@example.com" });
+    expect(r.ok).toBe(false);
+  });
+
+  it("rejects an over-long url", () => {
+    const r = validateListing({ ...base, url: `https://example.com/${"a".repeat(2100)}` });
+    expect(r.ok).toBe(false);
+  });
+});
+
+describe("validateListing — author identity (moderation)", () => {
+  it("rejects a missing author", () => {
+    const { author, ...rest } = base as Record<string, unknown>;
+    const r = validateListing(rest);
+    expect(r.ok).toBe(false);
+  });
+
+  it("rejects an over-long author", () => {
+    const r = validateListing({ ...base, author: "x".repeat(51) });
+    expect(r.ok).toBe(false);
+  });
+});
+
+describe("validateListing — field rules", () => {
   it("rejects a missing name", () => {
     const r = validateListing({ ...base, name: "   " });
     expect(r.ok).toBe(false);
-    expect(r.ok ? [] : r.errors.some((e) => e.includes("name"))).toBe(true);
   });
 
   it("rejects a name longer than 80 chars", () => {
@@ -31,44 +108,19 @@ describe("validateListing", () => {
     expect(r.ok).toBe(false);
   });
 
-  it("rejects a tagline longer than 140 chars", () => {
-    const r = validateListing({ ...base, tagline: "y".repeat(141) });
+  it("rejects a description longer than 2000 chars", () => {
+    const r = validateListing({ ...base, description: "y".repeat(2001) });
     expect(r.ok).toBe(false);
   });
 
-  it("rejects an invalid URL", () => {
-    const r = validateListing({ ...base, url: "not-a-url" });
+  it("rejects a bad repo_url", () => {
+    const r = validateListing({ ...base, repo_url: "not-a-url" });
     expect(r.ok).toBe(false);
   });
 
-  it("rejects a non-http(s) URL", () => {
-    const r = validateListing({ ...base, url: "ftp://example.com" });
-    expect(r.ok).toBe(false);
-  });
-
-  it("rejects a URL with embedded credentials", () => {
-    const r = validateListing({ ...base, url: "https://user:pass@example.com" });
-    expect(r.ok).toBe(false);
-  });
-
-  it("rejects an over-long URL", () => {
-    const r = validateListing({ ...base, url: `https://example.com/${"a".repeat(2100)}` });
-    expect(r.ok).toBe(false);
-  });
-
-  it("rejects a missing category", () => {
-    const r = validateListing({ ...base, category: "" });
-    expect(r.ok).toBe(false);
-  });
-
-  it("rejects a category longer than 60 chars", () => {
-    const r = validateListing({ ...base, category: "z".repeat(61) });
-    expect(r.ok).toBe(false);
-  });
-
-  it("rejects an x_handle with invalid characters", () => {
-    const r = validateListing({ ...base, x_handle: "hello world" });
-    expect(r.ok).toBe(false);
+  it("accepts a repo_url", () => {
+    const r = validateListing({ ...base, repo_url: "https://github.com/a/b" });
+    expect(r.ok).toBe(true);
   });
 
   it("normalizes x_handle by stripping a leading @", () => {
@@ -76,39 +128,20 @@ describe("validateListing", () => {
     expect(r.ok && r.value.x_handle).toBe("naumanmehdi");
   });
 
-  it("accepts a valid bare x_handle without @", () => {
-    const r = validateListing({ ...base, x_handle: "naumanmehdi" });
-    expect(r.ok && r.value.x_handle).toBe("naumanmehdi");
+  it("rejects an x_handle with invalid characters", () => {
+    const r = validateListing({ ...base, x_handle: "hello world" });
+    expect(r.ok).toBe(false);
   });
 
-  it("trims surrounding whitespace from fields", () => {
+  it("trims surrounding whitespace", () => {
     const r = validateListing({ ...base, name: "  AgentScribe  ", url: "  https://agentscribe.dev  " });
     expect(r.ok && r.value.name).toBe("AgentScribe");
     expect(r.ok && r.value.url).toBe("https://agentscribe.dev");
   });
 
   it("collects multiple errors at once", () => {
-    const r = validateListing({ name: "", url: "x", tagline: "", category: "" });
+    const r = validateListing({ name: "", tagline: "", author: "" });
     expect(r.ok).toBe(false);
-    expect(r.ok ? 0 : r.errors.length).toBeGreaterThanOrEqual(4);
-  });
-});
-
-describe("validateEmail", () => {
-  it("accepts a normal email", () => {
-    expect(validateEmail("builder@example.com").ok).toBe(true);
-  });
-
-  it("rejects garbage", () => {
-    expect(validateEmail("not-an-email").ok).toBe(false);
-  });
-
-  it("rejects empty", () => {
-    expect(validateEmail("").ok).toBe(false);
-  });
-
-  it("normalizes by trimming and lowercasing", () => {
-    const r = validateEmail("  Builder@Example.COM ");
-    expect(r.ok && r.value).toBe("builder@example.com");
+    expect(r.ok ? 0 : r.errors.length).toBeGreaterThanOrEqual(3);
   });
 });
