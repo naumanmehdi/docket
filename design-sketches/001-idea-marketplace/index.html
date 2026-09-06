@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Variant A — The Idea Marketplace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#faf5ec; --card:#fffdf8; --ink:#2a2016; --mut:#776a56;
+    --accent:#d94e1f; --accent-soft:#fbe2d4;
+    --teal:#0f6b58; --teal-soft:#dcefe8; --gold:#a76f16; --gold-soft:#f5e8cb;
+    --line:#e9dec9; --radius:18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"DM Sans",system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 26px 80px}
+  header{display:flex;align-items:center;justify-content:space-between;padding:24px 0}
+  .mark{display:flex;align-items:center;gap:10px;font-family:"Fraunces",serif;font-weight:700;font-size:19px}
+  .mark .dot{width:10px;height:10px;border-radius:50%}
+  .mark .dot.d1{background:var(--accent)}.mark .dot.d2{background:var(--gold)}.mark .dot.d3{background:var(--teal)}
+  .phase{font-size:12.5px;font-weight:600;color:var(--mut);background:var(--card);border:1px solid var(--line);padding:6px 13px;border-radius:999px}
+
+  /* hero */
+  .hero{text-align:center;padding:56px 0 30px}
+  .badge{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--teal);background:var(--teal-soft);padding:7px 15px;border-radius:999px;letter-spacing:.01em}
+  .hero h1{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(40px,6.2vw,68px);line-height:1.02;letter-spacing:-.02em;margin:22px auto 0;max-width:16ch}
+  .hero h1 .warm{color:var(--accent);font-style:italic}
+  .hero h1 .deep{color:var(--teal);font-style:italic}
+  .lede{max-width:60ch;margin:20px auto 0;font-size:clamp(17px,2.3vw,20px);color:var(--mut)}
+  .lede b{color:var(--ink)}
+  .cta{display:flex;gap:13px;justify-content:center;margin-top:30px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:9px;font-weight:600;font-size:15.5px;padding:14px 24px;border-radius:12px;text-decoration:none;border:1px solid transparent}
+  .btn.primary{background:var(--ink);color:#fff}
+  .btn.primary:hover{background:#000}
+  .btn.ghost{background:var(--card);color:var(--ink);border-color:var(--line)}
+  .btn.ghost:hover{border-color:#cbbd9f}
+  .hero .proof{margin-top:20px;font-size:13.5px;color:var(--mut)}
+  .hero .proof .av{display:inline-flex;align-items:center}
+  .hero .proof .a{width:26px;height:26px;border-radius:50%;margin-left:-7px;border:2px solid var(--paper);display:inline-flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:700}
+
+  /* the flip */
+  .flip{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:48px}
+  @media(max-width:760px){.flip{grid-template-columns:1fr}}
+  .flipcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px}
+  .flipcard .who{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--accent)}
+  .flipcard.dream .who{color:var(--teal)}
+  .flipcard h3{font-family:"Fraunces",serif;font-weight:600;font-size:22px;margin-top:8px}
+  .flipcard p{font-size:15px;color:var(--mut);margin-top:10px}
+  .flipcard .example{margin-top:16px;background:var(--paper);border:1px dashed var(--line);border-radius:12px;padding:12px 14px;font-size:14px;color:var(--ink)}
+  .flipcard .example em{font-style:italic;color:var(--mut)}
+
+  /* board preview */
+  .board{margin-top:60px}
+  .smallcap{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+  .row-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px}
+  .row-head h2{font-family:"Fraunces",serif;font-weight:600;font-size:30px;letter-spacing:-.01em}
+  .row-head .pill{font-size:12px;font-weight:700;color:var(--teal);background:var(--teal-soft);padding:6px 12px;border-radius:999px}
+  .cards{display:flex;flex-direction:column;gap:11px;margin-top:16px}
+  .card{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 16px;cursor:pointer;transition:transform .2s,box-shadow .2s}
+  .card:hover{transform:translateY(-2px);box-shadow:0 14px 34px -22px rgba(42,32,22,.35)}
+  .logo{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;color:#fff;font-weight:700;flex-shrink:0}
+  .info{flex:1;min-width:0}
+  .info b{font-size:15px;display:flex;align-items:center;gap:8px}
+  .info span{font-size:13px;color:var(--mut);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .chip{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap}
+  .kind{background:var(--paper);color:var(--mut);border:1px solid var(--line)}
+  .state.open{background:var(--teal-soft);color:var(--teal)}
+  .state.built{background:#e1efe0;color:#2e5d2b}
+  .state.clm{background:var(--gold-soft);color:var(--gold)}
+  .meta{display:flex;gap:7px;align-items:center;flex-shrink:0}
+
+  footer{text-align:center;color:var(--mut);font-size:13px;margin-top:60px;padding-top:24px;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="mark"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span>AppRank</div>
+    <span class="phase">free · open · agent-ready</span>
+  </header>
+
+  <section class="hero">
+    <span class="badge">● 2 ideas on the board are being built right now</span>
+    <h1>Have an idea? <span class="warm">Someone’s ready to build it.</span></h1>
+    <p class="lede">Post an idea you don’t have time to ship — or a builder who can’t find their next one.
+      Your <b>agent</b> does the listing and the searching. Ideas get found. Ideas get built.</p>
+    <div class="cta">
+      <a class="btn primary" href="#">Publish your idea free</a>
+      <a class="btn ghost" href="#">Browse what’s being built →</a>
+    </div>
+    <div class="proof">
+      <span class="av"><span class="a" style="background:#d94e1f">N</span><span class="a" style="background:#0f6b58">A</span><span class="a" style="background:#a76f16">S</span></span>
+      &nbsp;join 40+ builders finding & publishing here
+    </div>
+  </section>
+
+  <div class="flip">
+    <div class="flipcard dream">
+      <div class="who">I have an idea, but I can’t build</div>
+      <h3>Drop it here. Don’t let it die in a notes app.</h3>
+      <p>Tell your agent: “publish my idea about X.” It lands on the board, findable by any builder — or their agent — looking for something to make.</p>
+      <div class="example"><em>“publish my idea about an offline habit tracker for night-shift workers”</em> → published ✓</div>
+    </div>
+    <div class="flipcard">
+      <div class="who">I’m a builder, but I have no idea</div>
+      <h3>Ask for one. Start shipping today.</h3>
+      <p>Tell your agent: “find me something to build.” It returns unbuilt ideas, each with a real author behind it. You build it. Credit flows back.</p>
+      <div class="example"><em>“find me an unbuilt idea in health”</em> → 3 ideas, all open</div>
+    </div>
+  </div>
+
+  <section class="board">
+    <div class="row-head"><div><div class="smallcap">Live board</div><h2>Ideas waiting to be built</h2></div><span class="pill">2 of 5 open</span></div>
+    <div class="cards">
+      <div class="card">
+        <div class="logo" style="background:#d94e1f">S</div>
+        <div class="info"><b>Shift-copilot <span class="chip kind">idea</span></b><span>Offline-first habit tracker for night-shift workers</span></div>
+        <div class="meta"><span class="chip state open">open to build</span><span class="chip">by idea_owner</span></div>
+      </div>
+      <div class="card">
+        <div class="logo" style="background:#0f6b58">M</div>
+        <div class="info"><b>Meeting-wallet <span class="chip kind">idea</span></b><span>Turn every meeting note into a spendable token</span></div>
+        <div class="meta"><span class="chip state clm">claimed by @tara</span></div>
+      </div>
+      <div class="card">
+        <div class="logo" style="background:#a76f16">A</div>
+        <div class="info"><b>AgentScribe <span class="chip kind">app</span></b><span>Turns meetings into notes your agent can act on</span></div>
+        <div class="meta"><span class="chip state built">✓ built by @rishi</span></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>AppRank — the board where ideas become products, and your agent does the paperwork.</footer>
+</div>
+</body>
+</html>
