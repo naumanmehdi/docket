@@ -3,45 +3,87 @@
 Read this + `ARCHITECTURE.md` first, then `git status`. Don't re-derive anything — it's all below.
 
 ## Brand decided
-**Name: `docket` · Domain: `rundocket.xyz`** — swapped everywhere (single-sourced in
-`packages/core/src/brand.ts` + `apps/web/lib/site.ts`). User confirmed availability of rundocket.xyz.
+**Name: `docket` · Domain: `rundocket.xyz`** (lowercase wordmark everywhere). Swap lives in
+`packages/core/src/brand.ts` + `apps/web/lib/site.ts`.
 
-## Where the project stands
-The **agent-first catalog** build is **largely complete and committed** at `~/Hermes/apprank/app`
-(git clean at `12cfb2c`). Not deployed. Backend (core data layer, MCP server, migrations, rate-limit),
-web app (warm-dark design-D port), docs, and seed all done. 75 tests pass; production build passes.
+## Where the project stands (end of today)
 
-## The user's immediate next step
-**The user wants to DISCUSS the open items below first** (deploy/accounts, brand+domain, idea-lifecycle
-web UI, design-vision) — NOT test the build yet. In a new session, open with those decisions and let the
-user steer; do not jump to running/testing. To run the dev build when the user is ready:
-```bash
-# ~/Hermes/apprank/app  (Node 20 via nvm, local Postgres up, DB seeded w/ 31 rows)
-DATABASE_URL=postgres://localhost:5432/apprank npm run dev --workspace @apprank/web
-# → http://localhost:3000
-```
+### Built and committed
+- Monorepo: `packages/core` (shared data layer + zod validation + brand), `packages/mcp` (7-tool MCP server),
+  `apps/web` (Next.js 15 + React 19 warm-dark board).
+- 75 tests pass; production build passes under Node 20.
+- Supabase migrations applied (`listings` + `claim_log` tables). Seed: 31 listings across 4 kinds.
+- All user-facing copy rewritten to match the shipped 4-kind board.
+- Old content-flywheel/outreach templates marked ARCHIVED (not part of v1).
 
-## Open items / decisions (user-owned unless stated)
-1. **Deploy** — needs user accounts (GitHub repo + remote, Supabase project + `DATABASE_URL`, Vercel).
-   Apply `supabase/migrations/*`; set env vars; deploy web + MCP. See root `README.md`.
-2. ~~**Brand name + domain**~~ — **DONE 2026-09-06: `docket` / `rundocket.xyz`** (lowercase wordmark everywhere).
-3. **Idea-lifecycle web UI** — OPEN. Lifecycle works agent/MCP-side only; web shows state but no
+### Step A complete — test deploy live
+- **GitHub repo:** https://github.com/naumanmehdi/docket (pushed from `~/Hermes/apprank/app`)
+- **Supabase:** project `mgzjmjjrcuiwdjvjonzn` (named "docket"), pooler connection set up
+- **Vercel test deploy:** https://docket-9izw3lue6-naumandevs-projects.vercel.app
+  - Board renders, `llms.txt` serves, DATABASE_URL env set (secret), 31 seeded rows visible
+  - Deployment protection disabled for testing
+  - GitHub auto-deploy NOT connected (Vercel OAuth identity lacks repo write access)
+  - Custom domain `rundocket.xyz` NOT yet pointed (deferred to after test verify)
+
+### Step B deferred — MCP `/mcp` route
+- The MCP server currently runs as a standalone Node process (`node dist/index.js`, port 3001)
+- To host it on Vercel, an `/mcp` API route needs to be added inside `apps/web` so the MCP
+  rides the same Vercel deployment. This is the next build step when the user is ready.
+
+## Accounts & secrets (for next session setup)
+**GitHub:** `naumanmehdi` (note: accounts doc had `nauman388` — actual login is `naumanmehdi`)
+- gh CLI authenticated, `workflow` scope granted, repo `naumanmehdi/docket` created and pushed
+
+**Supabase:** project `mgzjmjjrcuiwdvjvonzn` (project name: "docket")
+- Personal access token: `[REDACTED]` (keep private)
+- Database password: `[REDACTED]`
+- Connection string (pooler):
+  ```
+  postgresql://postgres.mgzjmjjrcuiwdvjvonzn:[REDACTED]@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres
+  ```
+- CLI: `supabase login` via `SUPABASE_ACCESS_TOKEN`, `supabase link --project-ref mgzjmjjrcuiwdvjvonzn`
+- Migrations pushed (`supabase db push`), 31 rows seeded
+
+**Vercel:** user `nauman-dev`, project `naumandevs-projects/docket`
+- CLI authenticated
+- Project linked, deployed to temp `.vercel.app` domain
+- `DATABASE_URL` set as Vercel Secret across all environments
+- GitHub Git integration NOT connected (Vercel identity lacks repo write access; deploys via CLI)
+
+## Accounts file (outside git repo)
+Full account log kept at `~/Hermes/notes/app_accounts.md` — never pushed to GitHub.
+
+## Open items / decisions (next session)
+1. **Step B — MCP `/mcp` route:** build the `/mcp` API route inside `apps/web` so agents can connect
+   to the deployed Vercel host (this is the real agent-native front door).
+2. **Idea-lifecycle web UI** — OPEN. Lifecycle works agent/MCP-side only; web shows state but no
    claim/build buttons. Decide if a human web UI is wanted (would be small). `ARCHITECTURE.md §10`.
-4. **Design-vision sprint** — the high-end playful/motion "mind-blown" redesign (separate future
+3. **Design-vision sprint** — the high-end playful/motion "mind-blown" redesign (separate future
    workstream). `DESIGN-VISION.md`. Launch on D first; redesign is a front-end-only swap.
+4. **GitHub auto-deploy integration** — requires giving Vercel's GitHub app write access to the repo,
+   or using a Vercel GitHub App installation on the `naumanmehdi` account.
+5. **Custom domain** — point `rundocket.xyz` at the Vercel project after test deploy is verified.
 
 ## Files that matter (quick index)
 - `docs/README.md` → orientation index
 - `docs/ARCHITECTURE.md` → how the code is organised (read before touching code)
 - `docs/DESIGN-VISION.md` → future design concept
-- `apps/web/lib/copy.ts`, `lib/site.ts`, `lib/taxonomy.ts`, `lib/listing.ts` → single sources (copy/brand/categories/row-map)
+- `packages/core/src/brand.ts` → agent/server-facing name (single source)
+- `apps/web/lib/site.ts` → web-side name/domain (keep in sync with brand.ts)
+- `apps/web/lib/copy.ts` → all user-facing copy
 - `apps/web/app/globals.css` → all design tokens
-- `packages/core/src/brand.ts` → agent/server-facing name
+- `apps/web/app/api/listings/route.ts` → web publish endpoint (POST only)
+- `apps/web/app/page.tsx` → server-rendered board (reads from core Store directly)
+- `apps/web/app/llms.txt/route.ts` → open agent-readable index + install manifest
+- `packages/mcp/src/server.ts` → MCP tool definitions (7 tools)
+- `packages/mcp/src/index.ts` → standalone MCP server entrypoint
 - `supabase/migrations/*` → schema
 - `scripts/seed.mjs` → seeds 31 dev rows
-- Planning docs (product/decisions): `~/Hermes/apprank/apprank_idea/pm_wayfinder/{MVP,SPEC,MAP}.md`
+- `vercel.json` → Vercel deploy config (monorepo-aware)
+- `.env.example` → env var reference
+- Planning docs: `~/Hermes/apprank/apprank_idea/pm_wayfinder/{MVP,SPEC,MAP}.md`
 
 ## Do NOT
 - Re-explain the product to the user — it's in the planning docs + this handoff.
 - Touch another profile's files.
-- Assume the idea-lifecycle web UI or any open item is decided — ask the user.
+- Assume any open item is decided — ask the user.
