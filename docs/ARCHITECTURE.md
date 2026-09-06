@@ -104,3 +104,16 @@ DATABASE_URL_TEST=postgres://localhost:5432/apprank_test npm test
 ## 9. Where real listings are edited
 There's no edit UI in the MVP — editing stays human-side via direct DB or a future admin. Claim/lifecycle
 state changes come through the MCP verbs or directly in `store`.
+
+## 10. Known gap — no idea-lifecycle UI on the web (DECIDED scope, not a bug)
+**Status: OPEN decision / known gap.** The idea **lifecycle** (published → claimed → in_progress → built)
+is fully implemented in the **data layer + MCP verbs** (`claim_idea`, `update_claim`, `my_ideas`,
+`list_idea_activity`) — see `packages/core` + `packages/mcp`. The **web UI** shows the lifecycle *state*
+on idea cards ("open to build" / "claimed by X" / "✓ built by X") but has **no buttons/flow to drive it** —
+a human can't claim an idea or mark it built from the site; that's agent/MCP-side only.
+
+**Why:** the lifecycle was designed agent-native (your agent claims/builds on your behalf). Whether a
+human web UI for claim→build is wanted is **undecided** — revisit with the user before assuming it's a gap
+to close. If added, it would be small: claim/build buttons on idea cards calling the same `store` methods
+the MCP uses. (Decision log: `apprank_idea/pm_wayfinder/MAP.md` — add a D-row if resolved.)
+

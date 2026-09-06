@@ -3,6 +3,8 @@
 **The one folder to read first.** If you're a human or an agent picking this project up fresh, start here.
 
 ## Quick orientation
+- **If you're resuming a session / picking up mid-build:** read **`RESUME.md`** first — it's the live
+  handoff (where it stands, what's open, how to run). Then `ARCHITECTURE.md`.
 - **What it is:** a free, agent-native discovery catalog. One board across four kinds — **ideas, apps,
   MCP servers, agent skills** — published and found by humans *and* their AI agents. Publish an idea,
   or ask your agent to find you one to build. See `apprank_idea/pm_wayfinder/SPEC.md` for the product.
@@ -10,16 +12,18 @@
   `~/Hermes/apprank/apprank_idea/pm_wayfinder/`.
 
 ## Start with these, in order
-1. **`ARCHITECTURE.md`** — how the code is organised, the client/server rule, and where to change
+1. **`RESUME.md`** — live handoff for resuming work.
+2. **`ARCHITECTURE.md`** — how the code is organised, the client/server rule, and where to change
    branding/copy/categories. Read this before touching code.
-2. **`DESIGN-VISION.md`** — the *end-goal* high-end, playful, motion-rich design ambition. The current
+3. **`DESIGN-VISION.md`** — the *end-goal* high-end, playful, motion-rich design ambition. The current
    live design is a clean warm-dark base (design variant D); this is where the future "wow" concept lives.
-3. Repo root `README.md` + `SECURITY.md` for run/security details; `apprank_idea/pm_wayfinder/MAP.md`
+4. Repo root `README.md` + `SECURITY.md` for run/security details; `apprank_idea/pm_wayfinder/MAP.md`
    (decisions), `MVP.md` (build doc), `SPEC.md` (product).
 
 ## Docs index
 | File | What it's for |
 |---|---|
+| `RESUME.md` | **Live handoff** — current state, open items, how to run |
 | `ARCHITECTURE.md` | Engineering orientation — layers, client/server rule, single-source copy/brand/taxonomy, data model, flows, run steps |
 | `DESIGN-VISION.md` | The future high-end playful/motion design concept (not built) |
 | *(repo)* `README.md` | Repo quickstart (now points here) |
