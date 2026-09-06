@@ -17,6 +17,7 @@ export default function Catalog({ rows }: { rows: ListingRow[] }) {
   const [activeSub, setActiveSub] = useState("");
   const [query, setQuery] = useState("");
   const [shown, setShown] = useState(PAGE_SIZE);
+  const [subOpen, setSubOpen] = useState(false);
 
   const counts = useMemo(() => {
     const c: Record<string, number> = { all: rows.length };
@@ -46,6 +47,7 @@ export default function Catalog({ rows }: { rows: ListingRow[] }) {
     setActiveSub("");
     setQuery("");
     setShown(PAGE_SIZE);
+    setSubOpen(false);
   }
 
   return (
@@ -92,15 +94,16 @@ export default function Catalog({ rows }: { rows: ListingRow[] }) {
             <div className="subdd">
               <button
                 className="subtrig"
-                onClick={() => document.getElementById("subMenu")?.classList.toggle("open")}
+                onClick={() => setSubOpen((o) => !o)}
+                aria-expanded={subOpen}
               >
                 <span>{activeSub || COPY.board.allCats}</span>
                 <span className="subcaret">▾</span>
               </button>
-              <div className="cmenu" id="subMenu">
+              <div className={`cmenu${subOpen ? " open" : ""}`}>
                 <div
                   className={`mi ${activeSub === "" ? "sel" : ""}`}
-                  onClick={() => { setActiveSub(""); setShown(PAGE_SIZE); document.getElementById("subMenu")?.classList.remove("open"); }}
+                  onClick={() => { setActiveSub(""); setShown(PAGE_SIZE); setSubOpen(false); }}
                 >
                   {COPY.board.allCats}
                 </div>
@@ -108,7 +111,7 @@ export default function Catalog({ rows }: { rows: ListingRow[] }) {
                   <div
                     key={c}
                     className={`mi ${activeSub === c ? "sel" : ""}`}
-                    onClick={() => { setActiveSub(c); setShown(PAGE_SIZE); document.getElementById("subMenu")?.classList.remove("open"); }}
+                    onClick={() => { setActiveSub(c); setShown(PAGE_SIZE); setSubOpen(false); }}
                   >
                     {c}
                   </div>

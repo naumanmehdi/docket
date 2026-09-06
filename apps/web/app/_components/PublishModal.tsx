@@ -24,6 +24,7 @@ const NAME_PH: Record<Kind, string> = {
 };
 
 export default function PublishModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [tab, setTab] = useState<"form" | "agent">("form");
   const [kind, setKind] = useState<Kind>("idea");
   const [cats, setCats] = useState<string[]>([]);
   const [catQuery, setCatQuery] = useState("");
@@ -56,13 +57,14 @@ export default function PublishModal({ open, onClose }: { open: boolean; onClose
   }, [onClose]);
 
   function reset() {
-    setKind("idea"); setCats([]); setCatQuery(""); setName(""); setTag(""); setUrl("");
+    setTab("form"); setKind("idea"); setCats([]); setCatQuery(""); setName(""); setTag(""); setUrl("");
     setDesc(""); setAuthor(""); setMsg(null); setMenuOpen(false);
   }
 
   function addCat(c: string) {
     if (cats.includes(c) || cats.length >= 3) return;
     setCats((p) => [...p, c]); setCatQuery("");
+    setMenuOpen(false); // close so the user can pick the next category cleanly
   }
 
   async function submit() {
@@ -96,86 +98,98 @@ export default function PublishModal({ open, onClose }: { open: boolean; onClose
           <button className="x" onClick={onClose} aria-label="Close">×</button>
         </div>
 
-        {/* kind selector */}
-        <label className="mlab">What are you publishing?</label>
-        <select
-          className="minput"
-          value={kind}
-          onChange={(e) => { setKind(e.target.value as Kind); setCats([]); setCatQuery(""); }}
-        >
-          {KINDS.map((k) => <option key={k} value={k}>{KIND_LABEL[k]}</option>)}
-        </select>
-
-        <label className="mlab">{NAME_LABEL[kind]}</label>
-        <input className="minput" placeholder={NAME_PH[kind]} value={name} onChange={(e) => setName(e.target.value)} />
-
-        <label className="mlab">{TAG_LABEL[kind]}</label>
-        <input className="minput" placeholder={isIdea ? "The problem it solves / who it’s for" : "One line: what it is"} value={tag} onChange={(e) => setTag(e.target.value)} />
-
-        {needsUrl && (
-          <>
-            <label className="mlab">URL</label>
-            <input className="minput" placeholder="https://…" value={url} onChange={(e) => setUrl(e.target.value)} />
-          </>
-        )}
-
-        {!isIdea && (
-          <>
-            <label className="mlab">Category — optional, up to 3</label>
-            <div className="combo" ref={menuRef}>
-              <input
-                className="minput"
-                placeholder="Search categories…"
-                value={catQuery}
-                onFocus={() => setMenuOpen(true)}
-                onChange={(e) => { setCatQuery(e.target.value); setMenuOpen(true); }}
-              />
-              {menuOpen && (
-                <div className="cmenu">
-                  {catMatches.length === 0 ? (
-                    <div className="none">No matches</div>
-                  ) : catMatches.map((c) => (
-                    <div
-                      key={c}
-                      className={`mi ${cats.includes(c) ? "sel" : ""} ${cats.length >= 3 && !cats.includes(c) ? "dim" : ""}`}
-                      onClick={() => addCat(c)}
-                    >
-                      {c}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            {cats.length > 0 && (
-              <div className="selcats">
-                {cats.map((c) => (
-                  <span key={c} className="sc">
-                    {c}
-                    <button className="x" onClick={() => setCats((p) => p.filter((x) => x !== c))} aria-label="Remove">×</button>
-                  </span>
-                ))}
-                <span className="catcount">{cats.length} of 3 used</span>
-              </div>
-            )}
-          </>
-        )}
-
-        <label className="mlab">Description — optional</label>
-        <textarea className="minput" rows={3} placeholder={isIdea ? "Who it’s for, rough requirements, constraints…" : "A bit more about it"} value={desc} onChange={(e) => setDesc(e.target.value)} />
-
-        <label className="mlab">Your handle (X / GitHub)</label>
-        <input className="minput" placeholder="@yourhandle" value={author} onChange={(e) => setAuthor(e.target.value)} />
-
-        <button className="pbtn" onClick={submit} disabled={busy}>
-          {busy ? "Publishing…" : `Publish ${isIdea ? "idea" : "free"} →`}
-        </button>
-
-        {msg && <div className={`msg ${msg.kind}`}>{msg.text}</div>}
-
-        {/* agent hint */}
-        <div className="agent">
-          No agent? No problem — or just ask your own: <b>“publish my {isIdea ? "idea" : kind}…”</b>
+        {/* tabs */}
+        <div className="mtab">
+          <button className={tab === "form" ? "on" : ""} onClick={() => setTab("form")}>Web form</button>
+          <button className={tab === "agent" ? "on" : ""} onClick={() => setTab("agent")}>Or ask your agent</button>
         </div>
+
+        {tab === "form" ? (
+          <>
+            {/* kind selector */}
+            <label className="mlab">What are you publishing?</label>
+            <select
+              className="minput"
+              value={kind}
+              onChange={(e) => { setKind(e.target.value as Kind); setCats([]); setCatQuery(""); }}
+            >
+              {KINDS.map((k) => <option key={k} value={k}>{KIND_LABEL[k]}</option>)}
+            </select>
+
+            <label className="mlab">{NAME_LABEL[kind]}</label>
+            <input className="minput" placeholder={NAME_PH[kind]} value={name} onChange={(e) => setName(e.target.value)} />
+
+            <label className="mlab">{TAG_LABEL[kind]}</label>
+            <input className="minput" placeholder={isIdea ? "The problem it solves / who it’s for" : "One line: what it is"} value={tag} onChange={(e) => setTag(e.target.value)} />
+
+            {needsUrl && (
+              <>
+                <label className="mlab">URL</label>
+                <input className="minput" placeholder="https://…" value={url} onChange={(e) => setUrl(e.target.value)} />
+              </>
+            )}
+
+            {!isIdea && (
+              <>
+                <label className="mlab">Category — optional, up to 3</label>
+                <div className="combo" ref={menuRef}>
+                  <input
+                    className="minput"
+                    placeholder="Search categories…"
+                    value={catQuery}
+                    onFocus={() => setMenuOpen(true)}
+                    onChange={(e) => { setCatQuery(e.target.value); setMenuOpen(true); }}
+                  />
+                  <div className={`cmenu${menuOpen ? " open" : ""}`}>
+                    {catMatches.length === 0 ? (
+                      <div className="none">No matches</div>
+                    ) : catMatches.map((c) => (
+                      <div
+                        key={c}
+                        className={`mi ${cats.includes(c) ? "sel" : ""} ${cats.length >= 3 && !cats.includes(c) ? "dim" : ""}`}
+                        onClick={() => addCat(c)}
+                      >
+                        {c}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {cats.length > 0 && (
+                  <div className="selcats">
+                    {cats.map((c) => (
+                      <span key={c} className="sc">
+                        {c}
+                        <button className="x" onClick={() => setCats((p) => p.filter((x) => x !== c))} aria-label="Remove">×</button>
+                      </span>
+                    ))}
+                    <span className="catcount">{cats.length} of 3 used</span>
+                  </div>
+                )}
+              </>
+            )}
+
+            <label className="mlab">Description — optional</label>
+            <textarea className="minput" rows={3} placeholder={isIdea ? "Who it’s for, rough requirements, constraints…" : "A bit more about it"} value={desc} onChange={(e) => setDesc(e.target.value)} />
+
+            <label className="mlab">Your handle (X / GitHub)</label>
+            <input className="minput" placeholder="@yourhandle" value={author} onChange={(e) => setAuthor(e.target.value)} />
+
+            <button className="pbtn" onClick={submit} disabled={busy}>
+              {busy ? "Publishing…" : `Publish ${isIdea ? "idea" : "free"} →`}
+            </button>
+
+            {msg && <div className={`msg ${msg.kind}`}>{msg.text}</div>}
+          </>
+        ) : (
+          <div className="agentpane">
+            <p>Prefer your agent to do it? Just say one line where you already work:</p>
+            <div className="agent">“publish my idea about an <b>offline habit tracker for night-shift workers</b>”<br />→ it appears on the board as <b>open to build</b>.</div>
+            <p>Works for apps, MCPs and skills too:</p>
+            <div className="agent">“list my app” · “register this MCP” · “I made a Claude skill”</div>
+            <div className="agent">connect: <b>install apprank from https://{SITE.domain}/mcp</b></div>
+            <p className="hint2">Switching back to the web form publishes right here — same board.</p>
+          </div>
+        )}
       </div>
     </div>
   );

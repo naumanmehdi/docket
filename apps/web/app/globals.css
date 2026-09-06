@@ -186,7 +186,13 @@ textarea.minput { resize: vertical; }
 
 /* category combobox */
 .combo { position: relative; }
-.cmenu { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; max-height: 240px; overflow-y: auto; z-index: 40; box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.6); }
+.mtab { display: flex; gap: 8px; margin: 18px 0 6px; }
+.mtab button { flex: 1; padding: 11px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg2); color: var(--mut); font-weight: 600; font-size: 14px; cursor: pointer; }
+.mtab button.on { background: var(--fire); color: #1a0e04; border-color: var(--fire); }
+.agentpane p { color: var(--mut); font-size: 14px; margin: 14px 0 6px; }
+.agentpane .hint2 { color: var(--faint); font-size: 12.5px; margin-top: 16px; }
+.cmenu { display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; max-height: 240px; overflow-y: auto; z-index: 40; box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.6); }
+.cmenu.open { display: block; }
 .cmenu .mi { padding: 9px 13px; font-size: 13.5px; color: var(--mut); cursor: pointer; }
 .cmenu .mi:hover, .cmenu .mi.sel { background: var(--gold); color: #1a0e04; }
 .cmenu .mi.sel { font-weight: 600; }
