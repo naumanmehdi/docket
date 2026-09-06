@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Hybrid D v2 — warm-dark · discoverable · agent-native</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#16110c; --bg2:#1e1711; --panel:#231b13; --panel2:#2a2117;
+    --line:#3a2f22; --line-soft:#2e251a;
+    --ink:#f4ead8; --mut:#b3a184; --faint:#8a7a61;
+    --fire:#e8622d; --fire-soft:rgba(232,98,45,.14);
+    --gold:#d9a441; --teal:#4fae8e; --teal-soft:rgba(79,174,142,.13);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Inter",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 26px 90px}
+
+  header{display:flex;align-items:center;justify-content:space-between;padding:20px 0;position:sticky;top:0;background:rgba(22,17,12,.86);backdrop-filter:blur(8px);z-index:20}
+  .brand{display:flex;align-items:center;gap:11px;font-family:"Fraunces",serif;font-weight:600;font-size:20px}
+  .brand .mark{width:27px;height:27px;border-radius:8px;background:linear-gradient(140deg,var(--fire),var(--gold));display:grid;place-items:center;font-family:"Inter";font-weight:700;font-size:13px;color:#1a0e04}
+  nav a{color:var(--mut);text-decoration:none;font-size:14px;font-weight:500;margin-left:26px}
+  nav a:hover{color:var(--ink)}
+  nav .pill{background:var(--fire);color:#1a0e04;padding:9px 18px;border-radius:999px;font-weight:600;margin-left:18px}
+
+  /* hero — centered */
+  .hero{text-align:center;padding:52px 0 8px}
+  .kicker{display:inline-flex;align-items:center;gap:9px;font-size:13px;font-weight:600;color:var(--gold);background:rgba(217,164,65,.08);border:1px solid rgba(217,164,65,.25);padding:6px 15px;border-radius:999px}
+  .kicker i{width:7px;height:7px;border-radius:50%;background:var(--fire);box-shadow:0 0 10px var(--fire)}
+  h1{font-family:"Fraunces",serif;font-weight:500;font-size:clamp(38px,5.4vw,60px);line-height:1.04;letter-spacing:-.015em;margin:20px auto 0;max-width:20ch;text-wrap:balance}
+  h1 em{font-style:italic;color:var(--fire);font-weight:400}
+  h1 .accent{color:var(--gold)}
+  .lede{color:var(--mut);font-size:clamp(16px,2vw,19px);margin:16px auto 0;max-width:60ch}
+  .lede b{color:var(--ink);font-weight:600}
+  .cta{display:flex;gap:12px;justify-content:center;margin-top:24px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:9px;font-weight:600;font-size:15px;padding:13px 22px;border-radius:12px;text-decoration:none;border:1px solid transparent;cursor:pointer}
+  .btn.fire{background:var(--fire);color:#1a0e04}
+  .btn.fire:hover{background:#f06e39}
+  .btn.outline{color:var(--ink);border-color:var(--line)}
+  .btn.outline:hover{border-color:var(--gold)}
+  .mono{font-family:"DM Mono",monospace}
+
+  /* centered search */
+  .searchwrap{margin:26px auto 0;max-width:600px}
+  .searchbox{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:7px 7px 7px 20px;transition:border-color .2s}
+  .searchbox:focus-within{border-color:var(--fire)}
+  .searchbox input{flex:1;background:transparent;border:none;outline:none;color:var(--ink);font:500 15.5px "Inter"}
+  .searchbox input::placeholder{color:var(--faint)}
+  .searchbox .go{background:var(--fire);color:#1a0e04;border:none;font:600 14px "Inter";padding:11px 24px;border-radius:999px;cursor:pointer;white-space:nowrap}
+  .searchbox .go:hover{background:#f06e39}
+
+  /* slim warm terminal under hero */
+  .term{max-width:600px;margin:34px auto 0;background:var(--bg2);border:1px solid var(--line);border-radius:14px;overflow:hidden;text-align:left}
+  .term-head{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--line-soft)}
+  .term-head .d{width:10px;height:10px;border-radius:50%}
+  .term-head .t{flex:1;text-align:center;font-family:"DM Mono",monospace;font-size:11px;color:var(--faint)}
+  .term-body{padding:14px 18px 10px;font-family:"DM Mono",monospace;font-size:12.5px;line-height:1.9}
+  .term-body .ln{display:flex;gap:8px;flex-wrap:wrap}
+  .term-body .prompt{color:var(--gold)}
+  .term-body .cmd{color:var(--ink)}
+  .term-body .out{width:100%;color:var(--mut)}
+  .ok{color:var(--teal)}
+  .hl{color:var(--fire)}
+  .link{color:var(--gold);text-decoration:underline}
+  .caret{display:inline-block;width:6px;height:13px;background:var(--gold);vertical-align:middle;animation:bl 1.1s infinite}
+  @keyframes bl{50%{opacity:0}}
+
+  /* copyable install command */
+  .installrow{display:flex;align-items:center;gap:10px;justify-content:center;margin:18px auto 0;max-width:600px;flex-wrap:wrap}
+  .i-label{font-size:13px;color:var(--faint);font-weight:500}
+  .i-copy{display:inline-flex;align-items:center;gap:12px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px 10px 16px;cursor:pointer;transition:border-color .15s;color:var(--ink)}
+  .i-copy:hover{border-color:var(--gold)}
+  .i-code{font-size:13px;color:var(--ink);letter-spacing:-.01em}
+  .i-icon{color:var(--gold);font-size:15px;line-height:1}
+  .i-done{font-size:12.5px;color:var(--teal);font-weight:600}
+
+  /* category chooser (outbid-style, big) */
+  .catsec{margin-top:60px}
+  .catlabel{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);text-align:center}
+  .catlabel span{color:var(--faint)}
+  .catgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:18px}
+  @media(max-width:900px){.catgrid{grid-template-columns:repeat(5,minmax(0,1fr))}}
+  .cat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 14px 14px;cursor:pointer;text-align:left;transition:transform .15s,border-color .15s;color:var(--ink);min-width:0;display:flex;flex-direction:column}
+  .cat:hover{transform:translateY(-2px);border-color:var(--line)}
+  .cat.active{border-color:var(--fire);background:linear-gradient(160deg,var(--panel),rgba(232,98,45,.09))}
+  .cat .ico{font-family:"Fraunces",serif;font-weight:600;font-size:22px;color:var(--gold);line-height:1}
+  .cat.idea .ico{color:var(--teal)}.cat.app .ico{color:var(--fire)}.cat.mcp .ico{color:#d9a441}.cat.skill .ico{color:#c78fd6}
+  .cat .ct{font-family:"Fraunces",serif;font-weight:500;font-size:19px;margin-top:8px;line-height:1.05}
+  .cat .cd{color:var(--mut);font-size:12px;margin-top:6px;line-height:1.4;flex:1}
+  .cat .cnt{display:inline-flex;align-items:center;gap:7px;margin-top:10px;font-size:12px;color:var(--faint)}
+  .cat .cnt b{color:var(--ink);font-family:"DM Mono",monospace;font-weight:500}
+
+  /* sub-filter dropdown (apps/mcp/skill only) — custom warm-dark, consistent w/ modal */
+  .subsec{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:22px;justify-content:center}
+  .subsec .slabel{font-size:12px;color:var(--faint);font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+  .subdd{position:relative}
+  .subtrig{display:inline-flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);color:var(--ink);font:500 13.5px "Inter";padding:9px 14px;border-radius:10px;cursor:pointer;min-width:220px;justify-content:space-between}
+  .subtrig:hover{border-color:var(--gold)}
+  .subcaret{color:var(--gold);font-size:11px}
+  .subdd .cmenu{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--panel2);border:1px solid var(--line);border-radius:10px;max-height:280px;overflow-y:auto;z-index:30;box-shadow:0 20px 50px -20px rgba(0,0,0,.6);min-width:240px}
+
+  /* board */
+  .boardsec{margin-top:40px}
+  .bhead{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px}
+  .bhead .eyebrow{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+  .bhead .n{color:var(--faint);font-family:"DM Mono",monospace;font-size:13px}
+  .board{display:flex;flex-direction:column;gap:9px}
+  .brow{display:flex;align-items:center;gap:15px;background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:14px 18px;text-decoration:none;color:inherit;transition:border-color .15s,transform .15s}
+  .brow:hover{border-color:var(--gold);transform:translateX(3px)}
+  .brow .logo{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-family:"Fraunces",serif;font-weight:600;font-size:17px;flex-shrink:0}
+  .brow .mid{flex:1;min-width:0}
+  .brow .mid .t1{display:flex;align-items:center;gap:10px}
+  .brow .mid .nm{font-family:"Fraunces",serif;font-weight:500;font-size:19px;letter-spacing:-.01em}
+  .brow .mid .one{color:var(--ink);font-weight:600;font-size:14px}
+  .brow .mid .hd{margin-top:1px;font-weight:600;font-size:14px}
+  .brow .mid .full{color:var(--mut);font-size:13px;margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .brow .right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .brow .by{color:var(--faint);font-family:"DM Mono",monospace;font-size:12px}
+  .chip{font-size:10.5px;font-weight:600;padding:3px 10px;border-radius:999px;letter-spacing:.04em;white-space:nowrap}
+  .chip.sub{background:rgba(180,160,120,.12);color:var(--mut);border:1px solid var(--line)}
+  .chip.idea{background:var(--teal-soft);color:var(--teal)}
+  .chip.app{background:rgba(217,164,65,.14);color:var(--gold)}
+  .chip.mcp{background:rgba(199,143,214,.14);color:#c78fd6}
+  .chip.skill{background:rgba(232,98,45,.14);color:#e89b76}
+  .chip.st-open{background:var(--teal-soft);color:var(--teal)}
+  .chip.st-clm{background:rgba(217,164,65,.16);color:var(--gold)}
+  .chip.st-built{background:rgba(232,98,45,.12);color:#e89b76}
+  .go-link{font-size:13px;color:var(--gold);font-family:"DM Mono",monospace}
+  .empty{text-align:center;color:var(--faint);padding:40px 0}
+
+  /* publish modal (B + hint of C) */
+  .modal-mask{position:fixed;inset:0;background:rgba(10,7,4,.66);backdrop-filter:blur(4px);display:none;align-items:flex-start;justify-content:center;z-index:50;padding:40px 18px;overflow-y:auto}
+  .modal-mask.open{display:flex}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:18px;max-width:560px;width:100%;padding:26px 28px;box-shadow:0 40px 90px -30px rgba(0,0,0,.7)}
+  .modal .mhead{display:flex;align-items:center;justify-content:space-between}
+  .modal .mhead h3{font-family:"Fraunces",serif;font-weight:500;font-size:26px}
+  .modal .mhead .x{background:transparent;border:none;color:var(--faint);font-size:22px;cursor:pointer;line-height:1}
+  .modal .mhead .x:hover{color:var(--ink)}
+  .modal .mtab{display:flex;gap:8px;margin:20px 0 18px}
+  .modal .mtab button{flex:1;padding:11px;border-radius:10px;border:1px solid var(--line);background:var(--bg2);color:var(--mut);font:600 14px "Inter";cursor:pointer}
+  .modal .mtab button.on{background:var(--fire);color:#1a0e04;border-color:var(--fire)}
+  .modal .pane{display:none}
+  .modal .pane.on{display:block}
+  .modal label{display:block;font-size:13px;font-weight:600;color:var(--ink);margin:14px 0 6px}
+  .modal select,.modal input,.modal textarea{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:10px;color:var(--ink);font:500 14.5px "Inter";padding:11px 13px;outline:none}
+  .modal select:focus,.modal input:focus,.modal textarea:focus{border-color:var(--fire)}
+  .modal textarea{resize:vertical;min-height:72px}
+  .modal .pbtn{width:100%;margin-top:20px;background:var(--fire);color:#1a0e04;border:none;font:600 15px "Inter";padding:13px;border-radius:11px;cursor:pointer}
+  .modal .pbtn:hover{background:#f06e39}
+  .modal .agent{background:var(--bg2);border:1px dashed var(--line);border-radius:11px;padding:14px 16px;font-family:"DM Mono",monospace;font-size:12.5px;color:var(--mut);line-height:1.7}
+  .modal .agent b{color:var(--gold);font-weight:500}
+  .modal .msg{margin-top:14px;border-radius:10px;padding:11px 13px;font-size:14px;display:none}
+  .modal .msg.ok{display:block;background:var(--teal-soft);color:var(--teal)}
+  .modal .msg.err{display:block;background:rgba(232,98,45,.12);color:#e89b76}
+  .fld-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:480px){.fld-row{grid-template-columns:1fr}}
+  /* category combobox (searchable, up to 3) */
+  .combo{position:relative;margin-top:4px}
+  .combo input{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:10px;color:var(--ink);font:500 14px "Inter";padding:11px 13px;outline:none}
+  .combo input:focus{border-color:var(--fire)}
+  .cmenu{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--panel2);border:1px solid var(--line);border-radius:10px;max-height:220px;overflow-y:auto;z-index:30;box-shadow:0 20px 50px -20px rgba(0,0,0,.6)}
+  .cmenu .mi{padding:9px 13px;font-size:13.5px;color:var(--mut);cursor:pointer}
+  .cmenu .mi:hover,.cmenu .mi.sel{background:var(--gold);color:#1a0e04}
+  .cmenu .mi.sel{font-weight:600}
+  .cmenu .none{padding:9px 13px;font-size:13px;color:var(--faint)}
+  .selcats{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+  .selcats .sc{display:inline-flex;align-items:center;gap:7px;background:var(--gold);color:#1a0e04;border:none;border-radius:999px;padding:6px 11px 6px 13px;font:600 12.5px "Inter"}
+  .selcats .sc .x{background:transparent;border:none;color:#1a0e04;cursor:pointer;font-size:14px;line-height:1;font-weight:700}
+  .catcount{margin-top:8px;font-size:12px;color:var(--faint);font-family:"DM Mono",monospace}
+
+  footer{text-align:center;color:var(--faint);font-size:13px;margin-top:66px;padding-top:24px;border-top:1px solid var(--line-soft)}
+
+  /* load more */
+  .loadmore-wrap{display:flex;justify-content:center;margin-top:22px}
+  .loadmore{background:var(--panel);border:1px solid var(--line);color:var(--ink);font:600 14px "Inter";padding:11px 26px;border-radius:10px;cursor:pointer}
+  .loadmore:hover{border-color:var(--gold);color:var(--gold)}
+
+  /* ================= responsive ================= */
+  /* tablet & below */
+  @media(max-width:900px){
+    /* category cards: keep in a single row but scrollable so they don't crush */
+    .catgrid{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
+    .catgrid .cat{flex:0 0 auto;width:168px;scroll-snap-align:start}
+    .catgrid::-webkit-scrollbar{height:6px}
+    .catgrid::-webkit-scrollbar-thumb{background:var(--line);border-radius:999px}
+  }
+  /* mobile */
+  @media(max-width:680px){
+    .wrap{padding:0 16px 64px}
+    header{flex-wrap:wrap;gap:6px;padding:14px 0}
+    nav a{margin-left:0;font-size:13px;padding:6px 10px}
+    nav .pill{margin-left:0;padding:8px 14px}
+    nav{display:flex;gap:4px}
+    .hero{padding:34px 0 4px}
+    h1{font-size:clamp(30px,8vw,42px);line-height:1.08}
+    .lede{font-size:16px}
+    .cta{flex-direction:column;width:100%}
+    .cta .btn{width:100%;justify-content:center}
+    /* install command */
+    .installrow{margin-top:14px}
+    .i-copy{max-width:100%}
+    .i-code{font-size:11.5px;white-space:normal;word-break:break-word;text-align:left}
+    .i-label{font-size:12px}
+    /* search */
+    .searchbox{padding-left:14px}
+    .searchbox .go{padding:10px 16px}
+    /* terminal */
+    .term{margin-top:22px}
+    .term-body{padding:12px 14px 8px;font-size:11px;line-height:1.8}
+    .term-head .t{font-size:10px}
+    /* category */
+    .catsec{margin-top:44px}
+    .catgrid .cat{width:150px;padding:14px 12px}
+    .subsec{justify-content:flex-start}
+    .subtrig{min-width:0;flex:1;max-width:100%}
+    .subdd{flex:1}
+    .subdd .cmenu{min-width:0;width:100%}
+    /* board rows */
+    .brow{padding:12px 12px;gap:12px;flex-wrap:wrap}
+    .brow .by{display:none}
+    .brow .mid .full{-webkit-line-clamp:2}
+    .brow .right{gap:6px}
+    /* modal */
+    .modal{padding:20px 16px}
+    .modal .agent{font-size:11px}
+    .selcats .sc{font-size:11.5px}
+  }
+  /* small phones */
+  @media(max-width:400px){
+    h1{font-size:clamp(26px,9vw,34px)}
+    .term-body{font-size:10px}
+    .brow .mid .nm{font-size:17px}
+    .catgrid .cat{width:136px}
+  }
+  /* landscape short screens */
+  @media(max-height:520px){
+    .modal-mask{padding:16px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><span class="mark">A</span>AppRank</div>
+    <nav><a href="#explore">Explore</a><a href="#board">The board</a><a class="pill" href="#" onclick="openModal();return false;">Publish</a></nav>
+  </header>
+
+  <!-- HERO: centered -->
+  <section class="hero">
+    <span class="kicker"><i></i>free · open · agent-ready</span>
+    <h1>Ideas that get built. <em>An agent</em> that does the paperwork.</h1>
+    <p class="lede">One open index of <b>ideas, apps, MCPs, and skills</b>. Publish the thing you’ll never get to — or find what to build next. Browse here, or let your agent do it in a sentence.</p>
+
+    <!-- copyable MCP install command -->
+    <div class="installrow">
+      <span class="i-label">Connect your agent:</span>
+      <button class="i-copy" id="installCmd" data-copy="install apprank from https://apprank.dev/mcp">
+        <span class="i-code mono">install apprank from https://apprank.dev/mcp</span>
+        <span class="i-icon">⧉</span>
+      </button>
+      <span class="i-done" id="copied" style="display:none">copied ✓</span>
+    </div>
+
+    <div class="cta">
+      <a class="btn fire" href="#" onclick="openModal();return false;">Publish free</a>
+      <a class="btn outline" href="#board">Browse the board</a>
+    </div>
+
+    <!-- centered search -->
+    <div class="searchwrap">
+      <div class="searchbox">
+        <input id="q" placeholder="search ideas, apps, MCPs & skills…"/>
+        <button class="go" onclick="return false;">Search</button>
+      </div>
+    </div>
+
+    <!-- slim terminal -->
+    <div class="term">
+      <div class="term-head"><span class="d" style="background:#e8622d"></span><span class="d" style="background:#d9a441"></span><span class="d" style="background:#4fae8e"></span><span class="t">you → your agent</span></div>
+      <div class="term-body">
+        <div class="ln"><span class="prompt">➜</span><span class="cmd">install apprank from https://apprank.dev/mcp</span></div>
+        <div class="ln"><span class="out"><span class="ok">✓</span> 7 tools · publish · search · claim · check</span></div>
+        <div class="ln"><span class="prompt">➜</span><span class="cmd">publish my idea about an offline habit tracker</span></div>
+        <div class="ln"><span class="out"><span class="ok">✓</span> “Shift-copilot” is live → <span class="link">apprank.dev/i/8f3a</span></span></div>
+        <div class="ln"><span class="prompt">➜</span><span class="cmd">find me a Supabase MCP</span></div>
+        <div class="ln"><span class="out"><span class="hl">supabase-mcp</span> found · connect now</span></div>
+        <div class="ln"><span class="prompt">➜</span><span class="caret"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORY CHOOSER -->
+  <section class="catsec" id="explore">
+    <div class="catlabel">Choose a category <span>· or search above</span></div>
+    <div class="catgrid" id="catgrid"></div>
+
+    <!-- sub-filter -->
+    <div class="subsec" id="subsec"></div>
+  </section>
+
+  <!-- BOARD -->
+  <section class="boardsec" id="board">
+    <div class="bhead">
+      <div class="eyebrow" id="boardTitle">Everything</div>
+      <div class="n" id="boardCount"></div>
+    </div>
+    <div class="board" id="boardList"></div>
+    <div class="empty" id="empty" style="display:none">Nothing here yet — try another category, or publish the first one.</div>
+    <div class="loadmore-wrap"><button class="loadmore" id="loadMore" style="display:none" onclick="loadMore()">Load more</button></div>
+  </section>
+
+  <footer>AppRank — the open index across ideas, apps, MCPs &amp; skills. Every card links straight to the maker’s site. For builders and their agents.</footer>
+</div>
+
+<!-- PUBLISH MODAL -->
+<div class="modal-mask" id="publishModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="mhead">
+      <h3>Publish to AppRank</h3>
+      <button class="x" onclick="closeModal()" aria-label="Close">×</button>
+    </div>
+    <div class="mtab">
+      <button id="tabForm" class="on" onclick="switchTab('form')">Web form</button>
+      <button id="tabAgent" onclick="switchTab('agent')">Or ask your agent</button>
+    </div>
+
+    <!-- form pane -->
+    <div class="pane on" id="paneForm">
+      <label>What are you publishing?</label>
+      <select id="mKind">
+        <option value="idea">💡 Idea — an unbuilt thought</option>
+        <option value="app">App — a built product</option>
+        <option value="mcp">MCP server</option>
+        <option value="skill">Agent skill (Claude / OpenAI-compatible)</option>
+      </select>
+      <label id="lName">Idea name</label>
+      <input id="mName" placeholder="e.g. Offline-first habit tracker" />
+      <label id="lTag">One-line pitch</label>
+      <input id="mTag" placeholder="What it is / the problem it solves" />
+      <div id="urlWrap" style="display:none">
+        <label>URL</label>
+        <input id="mUrl" placeholder="https://…" />
+      </div>
+      <div id="catWrap" style="display:none">
+        <label>Category — optional, up to 3</label>
+        <div class="combo">
+          <input id="catInput" placeholder="Search categories…" autocomplete="off"/>
+          <div class="cmenu" id="catMenu" style="display:none"></div>
+        </div>
+        <div class="selcats" id="selCats"></div>
+        <div class="catcount" id="catCount"></div>
+      </div>
+      <label>Description — optional</label>
+      <textarea id="mDesc" placeholder="Who it’s for, rough requirements, constraints…"></textarea>
+      <label>Your handle (X / GitHub)</label>
+      <input id="mAuthor" placeholder="@yourhandle" />
+      <button class="pbtn" onclick="fakePublish()">Publish free →</button>
+      <div class="msg" id="pMsg"></div>
+    </div>
+
+    <!-- agent pane -->
+    <div class="pane" id="paneAgent">
+      <p style="color:var(--mut);font-size:14px;margin-bottom:6px">Prefer your agent to do it? Just say one line where you already work:</p>
+      <div class="agent">
+        “publish my idea about an <b>offline habit tracker for night-shift workers</b>”<br/>
+        → it appears on the board as <b>open to build</b>.
+      </div>
+      <p style="color:var(--mut);font-size:13.5px;margin-top:16px">Works for apps, MCPs and skills too:</p>
+      <div class="agent" style="margin-top:8px">“list my app” · “register this MCP” · “I made a Claude skill”</div>
+      <div class="agent" style="margin-top:8px">connect: <b>install apprank from https://apprank.dev/mcp</b></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = [
+  // ideas (unbuilt)
+  {kind:"idea", name:"Shift-copilot", one:"Offline-first habit tracker for night-shift workers", full:"Most habit apps assume a 9–5. Built around rotating shifts — plan on-device, sync when possible.", by:"@idea_owner", state:"open", logo:"S", lc:"rgba(79,174,142,.2)", lcc:"var(--teal)", sub:"", url:null},
+  {kind:"idea", name:"Meeting-wallet", one:"Turn every meeting note into a spendable token", full:"Save the notes you already write as a personal knowledge currency you can trade or gift.", by:"@naumanmehdi", state:"claimed", logo:"M", lc:"rgba(79,174,142,.2)", lcc:"var(--teal)", sub:"", url:null},
+  // apps
+  {kind:"app", name:"AgentScribe", one:"Turns meetings into notes your agent can act on", full:"Records, transcribes and turns any meeting into structured, actionable notes.", by:"@rishi", state:"", logo:"A", lc:"rgba(232,98,45,.18)", lcc:"#e89b76", sub:"AI Agents & Infrastructure", url:"https://agentscribe.dev"},
+  {kind:"app", name:"QueryGenie", one:"Answers research questions from your documents", full:"Upload PDFs and docs, ask questions, get cited answers — a research copilot.", by:"@querygenie", state:"", logo:"Q", lc:"rgba(217,164,65,.18)", lcc:"var(--gold)", sub:"Writing & Content", url:"https://querygenie.ai"},
+  {kind:"app", name:"MindFlow", one:"Organises your tasks with an AI copilot", full:"A task manager that plans your day and reprioritises as things change.", by:"@mindflow", state:"", logo:"M", lc:"rgba(79,174,142,.2)", lcc:"var(--teal)", sub:"Productivity & Personal Tools", url:"https://mindflow.app"},
+  {kind:"app", name:"ColorCraft", one:"Generates accessible colour palettes in seconds", full:"Contrast-safe palettes for designers, generated from one seed colour.", by:"@colorcraft", state:"", logo:"C", lc:"rgba(199,143,214,.2)", lcc:"#c78fd6", sub:"Design & Creative", url:"https://colorcraft.io"},
+  // mcps
+  {kind:"mcp", name:"supabase-mcp", one:"Query & manage your Postgres from any agent", full:"Official MCP server to inspect schemas, run queries and manage Supabase projects.", by:"@supabase", state:"", logo:"S", lc:"rgba(217,164,65,.18)", lcc:"var(--gold)", sub:"Database", url:"https://github.com/supabase-community/supabase-mcp"},
+  {kind:"mcp", name:"context-dev", one:"Scrape any URL to clean markdown for agents", full:"Web scraping + crawling API built for LLM and agent pipelines.", by:"@context", state:"", logo:"C", lc:"rgba(79,174,142,.2)", lcc:"var(--teal)", sub:"Browser & Web", url:"https://context.dev"},
+  {kind:"mcp", name:"fs-write-mcp", one:"Let your agent read & write files locally, safely", full:"Scoped file access so an agent can work across a repo without overstepping.", by:"@filesys", state:"", logo:"F", lc:"rgba(199,143,214,.2)", lcc:"#c78fd6", sub:"File & Storage", url:"https://github.com/example/fs-write"},
+  // skills
+  {kind:"skill", name:"stripe-skills", one:"Official Stripe payments skills for coding agents", full:"Create customers, handle checkouts and parse webhooks straight from your agent.", by:"@stripe", state:"", logo:"S", lc:"rgba(232,98,45,.18)", lcc:"#e89b76", sub:"Sales & CRM", url:"https://github.com/Stripe/agent-toolkit"},
+  {kind:"skill", name:"copy-craft", one:"Turn rough notes into polished marketing copy", full:"A writing skill that takes bullets and produces on-voice drafts, headlines and CTAs.", by:"@copydev", state:"", logo:"C", lc:"rgba(217,164,65,.18)", lcc:"var(--gold)", sub:"Writing & Content", url:"https://example.com/copy-craft"},
+  {kind:"skill", name:"data-wrangler", one:"Clean & explore a messy dataset in one pass", full:"Load CSVs, spot gaps, and produce analysis-ready tables with clear summaries.", by:"@datafolk", state:"", logo:"D", lc:"rgba(79,174,142,.2)", lcc:"var(--teal)", sub:"Data & Analytics", url:"https://example.com/data-wrangler"},
+];
+
+// --- expand the sample board with more generated rows so pagination/load-more is demonstrable ---
+(function fillBoard(){
+  const extraApps = [
+    ["MeetingSense","Transcribes and summarises every call, live","Communication & Collaboration","https://meetingsense.app","msense"],
+    ["PromptHealer","Repairs broken AI prompts with one click","AI Media Generation","https://prompthealer.dev","prompthealer"],
+    ["DataDrift","Watches your dashboards and flags anomalies","Data & Analytics","https://datadrift.io","datadrift"],
+    ["LaunchPad","Ships your side project to a live URL in minutes","Developer Tools","https://launchpad.dev","launchpad"],
+    ["Sketchmate","Turns rough wireframes into clickable prototypes","Design & Creative","https://sketchmate.app","sketchmate"],
+    ["CopyLift","Writes on-brand copy from a single brief","Marketing & Advertising","https://copylift.ai","copylift"],
+    ["RecruitBot","Shortlists candidates from a pile of CVs","Hiring, Jobs & Careers","https://recruitbot.io","recruitbot"],
+    ["LedgerEye","Automates bookkeeping from receipts","Business, Finance & Legal","https://ledgereye.app","ledgereye"],
+    ["VaultKey","Manages secrets and access for your infra","Security, Privacy & Compliance","https://vaultkey.dev","vaultkey"],
+    ["PulseDesk","Measures team sentiment from Slack messages","Productivity & Personal Tools","https://pulsdesk.app","pulsedesk"],
+    ["ShopMind","Personalises storefronts for every visitor","Ecommerce & Retail","https://shopmind.ai","shopmind"],
+    ["ScriptForge","Writes, debugs and deploys small scripts","Developer Tools","https://scriptforge.dev","scriptforge"],
+    ["ToneMatch","Rewrites any text in your brand voice","Writing & Content","https://tonematch.io","tonematch"],
+    ["ReelCraft","Edits short clips into platform-ready reels","AI Media Generation","https://reelcraft.app","reelcraft"],
+  ];
+  const extraMcps = [
+    ["notion-mcp","Read and write Notion pages from any agent","Memory & Knowledge","https://github.com/notion/notion-mcp"],
+    ["slack-mcp","Send and read Slack messages agent-side","Communication","https://github.com/slack/slack-mcp"],
+    ["redis-mcp","Inspect and query Redis from your agent","Database","https://github.com/example/redis-mcp"],
+    ["stripe-mcp","Create payments and parse webhooks","Payments","https://github.com/example/stripe-mcp"],
+    ["s3-mcp","Upload and fetch files in S3-compatible storage","File & Storage","https://github.com/example/s3-mcp"],
+    ["posthog-mcp","Query product analytics events","Observability & Logging","https://github.com/example/posthog-mcp"],
+    ["gh-mcp","Open issues and PRs on GitHub","Coding & IDE","https://github.com/example/gh-mcp"],
+    ["linear-mcp","Manage issues and cycles in Linear","Productivity & Personal Tools","https://github.com/example/linear-mcp"],
+  ];
+  const extraSkills = [
+    ["pr-reviewer","Reviews pull requests for bugs and style","Coding & Engineering","https://example.com/pr-reviewer"],
+    ["research-deep","Pulls cited sources and writes a brief","Research & Analysis","https://example.com/research-deep"],
+    ["seo-audit","Checks a page and lists SEO fixes","Marketing & Growth","https://example.com/seo-audit"],
+    ["interview-prep","Runs mock interviews and scores answers","Education & Learning","https://example.com/interview-prep"],
+    ["data-cleanse","Finds and fixes dirty data in a CSV","Data & Analytics","https://example.com/data-cleanse"],
+  ];
+  const moreIdeas = [
+    ["Auto-budgeter","An app that categorises spend and nudges before you overspend","open"],
+    ["Meeting-scribe","Turn any voice memo into a clean written summary","open"],
+    ["Recipe-swapper","Swap ingredients by diet and taste in one tap","open"],
+  ];
+  const palette=["rgba(79,174,142,.2)","rgba(232,98,45,.18)","rgba(217,164,65,.18)","rgba(199,143,214,.2)"];
+  const text=["var(--teal)","#e89b76","var(--gold)","#c78fd6"];
+  let row;
+  for(const [name,one,sub,url,by] of extraApps){ row={kind:"app",name,one,full:one+".",by:"@"+(by||"maker"),state:"",logo:name[0],lc:palette[DATA.length%4],lcc:text[DATA.length%4],sub,url}; DATA.push(row); }
+  for(const [name,one,sub,url] of extraMcps){ row={kind:"mcp",name,one,full:one+".",by:"@maker",state:"",logo:name[0],lc:palette[DATA.length%4],lcc:text[DATA.length%4],sub,url}; DATA.push(row); }
+  for(const [name,one,sub,url] of extraSkills){ row={kind:"skill",name,one,full:one+".",by:"@maker",state:"",logo:name[0],lc:palette[DATA.length%4],lcc:text[DATA.length%4],sub,url}; DATA.push(row); }
+  for(const [name,one,state] of moreIdeas){ row={kind:"idea",name,one,full:one+".",by:"@maker",state,logo:name[0],lc:"rgba(79,174,142,.2)",lcc:"var(--teal)",sub:"",url:null}; DATA.push(row); }
+})();
+
+
+const KIND_LABEL = {idea:"Ideas",app:"Apps",mcp:"MCPs",skill:"Skills"};
+const CAT_META = {
+  idea:{ico:"I",color:"var(--teal)",desc:"Unbuilt thoughts waiting for a builder. Publish one, or find yours."},
+  app:{ico:"A",color:"var(--fire)",desc:"Built products. Click any card to open the maker’s site."},
+  mcp:{ico:"M",color:"var(--gold)",desc:"Servers any agent can connect to. Open the repo to install."},
+  skill:{ico:"S",color:"#c78fd6",desc:"Claude & OpenAI-compatible skills. Load one into your agent."},
+};
+
+let activeCat = "all";
+let activeSub = "";
+let query = "";
+
+function count(k){ return DATA.filter(d=>d.kind===k).length; }
+function counts(){ let o={all:DATA.length}; for(const k in KIND_LABEL) o[k]=count(k); return o; }
+
+function renderCats(){
+  const c=counts(), g=document.getElementById("catgrid"); g.innerHTML="";
+  const items=[
+    {k:"all", label:"Everything", desc:"Ideas, apps, MCPs and skills in one place.", n:c.all},
+    ...Object.keys(KIND_LABEL).map(k=>({k, label:KIND_LABEL[k], desc:CAT_META[k].desc, n:c[k]}))
+  ];
+  for(const it of items){
+    const el=document.createElement("div");
+    el.className="cat "+it.k+(activeCat===it.k?" active":"");
+    el.innerHTML=`<div class="ico" style="color:${it.k==="all"? "var(--gold)":CAT_META[it.k].color}">${it.k==="all"?"✦":CAT_META[it.k].ico}</div>
+      <div class="ct">${it.label}</div><div class="cd">${it.desc}</div>
+      <div class="cnt"><b>${it.n}</b> ${it.n===1?"item":"items"}</div>`;
+    el.onclick=()=>{activeCat=it.k; activeSub=""; clearQuery(); resetPaging(); renderCats(); renderSubs(); renderBoard();};
+    g.appendChild(el);
+  }
+}
+function renderSubs(){
+  const s=document.getElementById("subsec"); s.innerHTML="";
+  if(activeCat==="all"||activeCat==="idea"){ s.style.display="none"; return; }
+  s.style.display="flex";
+  const sl=document.createElement("span"); sl.className="slabel"; sl.textContent="Category";
+  s.appendChild(sl);
+  // custom dropdown trigger + menu (consistent warm-dark, not native OS select)
+  const wrap=document.createElement("div"); wrap.className="subdd";
+  const trig=document.createElement("button"); trig.className="subtrig";
+  trig.innerHTML = `<span>${activeSub||"All categories"}</span><span class="subcaret">▾</span>`;
+  const menu=document.createElement("div"); menu.className="cmenu"; menu.style.display="none";
+  const mk=(label,val)=>{
+    const it=document.createElement("div"); it.className="mi";
+    it.textContent=label;
+    if(activeSub===val){ it.classList.add("sel"); }
+    it.onclick=()=>{ activeSub=val; hideSubMenu(); resetPaging(); renderSubs(); renderBoard(); };
+    return it;
+  };
+  menu.appendChild(mk("All categories",""));
+  for(const sub of KIND_CATS[activeCat]) menu.appendChild(mk(sub,sub));
+  trig.onclick=()=>{ menu.style.display = menu.style.display==="none"?"block":"none"; };
+  wrap.appendChild(trig); wrap.appendChild(menu); s.appendChild(wrap);
+}
+function hideSubMenu(){
+  const m=document.querySelector("#subsec .cmenu");
+  if(m) m.style.display="none";
+}
+document.addEventListener("click",(e)=>{
+  if(!e.target.closest(".subdd")){ const m=document.querySelector("#subsec .cmenu"); if(m) m.style.display="none"; }
+});
+function filtered(){
+  return DATA.filter(d=>{
+    if(activeCat!=="all" && d.kind!==activeCat) return false;
+    if(activeSub && d.sub!==activeSub) return false;
+    if(query){ const hay=(d.name+" "+d.one+" "+d.full+" "+d.sub).toLowerCase(); if(!hay.includes(query)) return false; }
+    return true;
+  });
+}
+function clearQuery(){ query=""; qInput.value=""; }
+const PAGE_SIZE = 8; // rows shown per "page"; load-more appends another page
+let shownCount = PAGE_SIZE;
+function renderBoard(){
+  const list=filtered(), board=document.getElementById("boardList");
+  const total=list.length;
+  // clamp shownCount to total (in case filters shrank the list)
+  shownCount = Math.min(shownCount, total);
+  document.getElementById("empty").style.display = total? "none":"block";
+  const title = activeCat==="all"? "Everything" : KIND_LABEL[activeCat] + (activeSub? " · "+activeSub : "");
+  document.getElementById("boardTitle").textContent = title;
+  document.getElementById("boardCount").textContent = total+" item"+(total===1?"":"s");
+  board.innerHTML="";
+  const page = list.slice(0, shownCount);
+  for(const d of page){
+    const el=document.createElement("a"); el.className="brow";
+    if(d.url){ el.href=d.url; el.target="_blank"; el.rel="noopener noreferrer"; }
+    let right="";
+    if(d.kind==="idea"){
+      const chip = d.state==="open"? '<span class="chip st-open">open to build</span>'
+        : d.state==="claimed"? '<span class="chip st-clm">claimed</span>' : '<span class="chip st-built">✓ shipped</span>';
+      right=`<span class="chip sub">idea</span>${chip}<span class="by">${d.by}</span>`;
+    } else {
+      right=`<span class="chip sub">${d.sub||d.kind}</span><span class="go-link mono">↗ open</span>`;
+    }
+    el.innerHTML=`<div class="logo" style="background:${d.lc};color:${d.lcc}">${d.logo}</div>
+      <div class="mid">
+        <div class="t1"><span class="nm">${d.name}</span><span class="chip ${d.kind}">${d.kind}</span></div>
+        <div class="one">${d.one}</div>
+        <div class="full">${d.full}</div>
+      </div>
+      <div class="right">${right}</div>`;
+    board.appendChild(el);
+  }
+  // load-more button
+  const moreBtn=document.getElementById("loadMore");
+  const more = total - shownCount;
+  moreBtn.style.display = more>0? "block":"none";
+  moreBtn.textContent = "Load more ("+more+" remaining)";
+}
+function loadMore(){
+  shownCount += PAGE_SIZE;
+  renderBoard();
+}
+// reset paging whenever the filter/query/category changes
+function resetPaging(){ shownCount=PAGE_SIZE; }
+
+// search bind
+const qInput=document.getElementById("q");
+qInput.addEventListener("input",()=>{query=qInput.value.trim().toLowerCase(); resetPaging(); renderBoard();});
+
+// ---------- publish modal ----------
+const PUBLISH_KINDS = {
+  idea:  { name:"Idea name",    tag:"One-line problem / pitch",          url:false, namePh:"e.g. Offline-first habit tracker" },
+  app:   { name:"App name",     tag:"One-line tagline",                   url:true,  namePh:"e.g. AgentScribe" },
+  mcp:   { name:"MCP name",     tag:"One-line tagline",                   url:true,  namePh:"e.g. supabase-mcp" },
+  skill: { name:"Skill name",   tag:"One-line tagline",                   url:true,  namePh:"e.g. copy-craft" },
+};
+// categories per built kind (ideas get none — they're uncategorized thoughts)
+const KIND_CATS = {
+  app:   ["AI Agents & Infrastructure","SEO & AI Visibility","Marketing & Advertising","Crypto, Web3 & Investing","Developer Tools","Business, Finance & Legal","Security, Privacy & Compliance","Health, Fitness & Wellness","Social Media & Creator Tools","Leaderboards & Attention Markets","Hiring, Jobs & Careers","Education & Learning","Agencies, Studios & Services","Ecommerce & Retail","Domains & Web Assets","Games & Entertainment","People & Profiles","Productivity & Personal Tools","Design & Creative","Writing & Content","Directories, Launch & Discovery","AI Media Generation","Audio, Voice & Podcasting","Sales & Lead Generation","Travel, Local & Lifestyle","Real Estate & Property","Media & News","Other"],
+  mcp:   ["Database","Cloud & Hosting","Coding & IDE","Browser & Web","File & Storage","Memory & Knowledge","Search & Retrieval","Communication","Notifications","Observability & Logging","Webhooks & APIs","Security & Auth","Payments","Machine Learning","Monitoring","Developer Tools","Other"],
+  skill: ["Writing & Content","Coding & Engineering","Research & Analysis","Marketing & Growth","Design & Creative","Data & Analytics","Productivity & Personal","Sales & CRM","Customer Support","Finance & Accounting","Agents & Orchestration","Security & Compliance","Education & Learning","Media & Audio","Other"],
+};
+// alphabetical (case-insensitive), used by the publish picker + board dropdown
+for(const k in KIND_CATS){ KIND_CATS[k].sort((a,b)=>a.toLowerCase().localeCompare(b.toLowerCase())); }
+let selectedCats = [];
+function availableCats(){ const k=document.getElementById("mKind").value; return k==="idea"?[]:KIND_CATS[k]; }
+function refreshCatPicker(){
+  const k=document.getElementById("mKind").value, cats=availableCats();
+  const wrap=document.getElementById("catWrap");
+  if(k==="idea"||cats.length===0){ wrap.style.display="none"; return; }
+  wrap.style.display="block";
+  const q=document.getElementById("catInput").value.trim().toLowerCase();
+  const menu=document.getElementById("catMenu");
+  menu.innerHTML="";
+  const match = cats.filter(c=>c.toLowerCase().includes(q));
+  if(match.length===0){ const n=document.createElement("div"); n.className="none"; n.textContent="No matches"; menu.appendChild(n); }
+  else for(const c of match){
+    const item=document.createElement("div");
+    item.className="mi"+(selectedCats.includes(c)?" sel":"");
+    item.textContent=c;
+    if(!selectedCats.includes(c)) item.onclick=()=>{ addCat(c); };
+    menu.appendChild(item);
+  }
+  renderSelChips();
+}
+function renderSelChips(){
+  const box=document.getElementById("selCats"), count=document.getElementById("catCount");
+  box.innerHTML="";
+  for(const c of selectedCats){
+    const chip=document.createElement("span"); chip.className="sc"; chip.textContent=c;
+    const x=document.createElement("button"); x.className="x"; x.innerHTML="×";
+    x.onclick=()=>{ selectedCats=selectedCats.filter(y=>y!==c); refreshCatPicker(); };
+    chip.appendChild(x); box.appendChild(chip);
+  }
+  count.textContent = selectedCats.length===0 ? "" : `${selectedCats.length} of 3 used`;
+}
+function addCat(c){
+  if(selectedCats.includes(c)) return;
+  if(selectedCats.length>=3) return;
+  selectedCats.push(c);
+  document.getElementById("catInput").value="";
+  refreshCatPicker();
+}
+function onCatInput(){
+  // live filter the dropdown
+  const menu=document.getElementById("catMenu");
+  menu.style.display="block";
+  refreshCatPicker();
+}
+function hideMenu(){
+  document.getElementById("catMenu").style.display="none";
+  document.getElementById("catInput").value="";
+  refreshCatPicker();
+}
+function resetCats(){ selectedCats=[]; document.getElementById("catInput").value=""; refreshCatPicker(); }
+function syncCatWrap(){
+  // show/hide the whole category area based on kind; called on kind change + open.
+  const k=document.getElementById("mKind").value, wrap=document.getElementById("catWrap");
+  if(k==="idea"){ wrap.style.display="none"; selectedCats=[]; return; }
+  wrap.style.display="block";
+  document.getElementById("catInput").value="";
+  const menu=document.getElementById("catMenu");
+  menu.style.display="none"; // closed until the user clicks/focuses the field
+  refreshCatPicker();
+}
+function openModal(){ document.getElementById("publishModal").classList.add("open"); resetPublish(); syncCatWrap(); }
+function closeModal(){ document.getElementById("publishModal").classList.remove("open"); resetPublish(); }
+function switchTab(t){
+  document.getElementById("tabForm").classList.toggle("on", t==="form");
+  document.getElementById("tabAgent").classList.toggle("on", t==="agent");
+  document.getElementById("paneForm").classList.toggle("on", t==="form");
+  document.getElementById("paneAgent").classList.toggle("on", t==="agent");
+}
+function resetPublish(){ const m=document.getElementById("pMsg"); m.className="msg"; m.textContent=""; }
+function onKindChange(){
+  const k=document.getElementById("mKind").value, cfg=PUBLISH_KINDS[k];
+  document.getElementById("lName").textContent=cfg.name;
+  document.getElementById("lTag").textContent=cfg.tag;
+  document.getElementById("mName").placeholder=cfg.namePh;
+  document.getElementById("urlWrap").style.display=cfg.url?"block":"none";
+  if(!cfg.url) document.getElementById("mUrl").value="";
+  selectedCats=[]; syncCatWrap();
+}
+function fakePublish(){
+  const k=document.getElementById("mKind").value, cfg=PUBLISH_KINDS[k];
+  const name=document.getElementById("mName").value.trim();
+  const tag=document.getElementById("mTag").value.trim();
+  const author=document.getElementById("mAuthor").value.trim();
+  const msg=document.getElementById("pMsg");
+  if(!name||!tag||!author){ msg.className="msg err"; msg.textContent="Please fill in the name, pitch and your handle."; return; }
+  if(cfg.url && !/^https?:\/\/.+/.test(document.getElementById("mUrl").value.trim())){ msg.className="msg err"; msg.textContent="A valid URL (starting http:// or https://) is required for a "+(k==="mcp"?"MCP":k)+"."; return; }
+  msg.className="msg ok";
+  const catTxt = selectedCats.length ? " · "+selectedCats.join(", ") : "";
+  msg.textContent = (cfg.url ? "\u201C"+name+"\u201D is live on the board." : "\u201C"+name+"\u201D is on the board, open to build.")+catTxt;
+  document.getElementById("mName").value=""; document.getElementById("mTag").value=""; document.getElementById("mUrl").value=""; document.getElementById("mDesc").value=""; document.getElementById("mAuthor").value="";
+  selectedCats=[]; resetCats();
+}
+document.getElementById("mKind").addEventListener("change", onKindChange);
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeModal(); });
+
+// category combobox bind
+document.getElementById("catInput").addEventListener("focus", onCatInput);
+document.getElementById("catInput").addEventListener("input", onCatInput);
+document.addEventListener("click", (e)=>{ if(!e.target.closest(".combo")) hideMenu(); });
+
+// copy install command
+document.getElementById("installCmd").addEventListener("click", async ()=>{
+  const cmd = document.getElementById("installCmd").dataset.copy || "";
+  try { await navigator.clipboard.writeText(cmd); }
+  catch {
+    const ta=document.createElement("textarea"); ta.value=cmd; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); }catch{} ta.remove();
+  }
+  const d=document.getElementById("copied"); d.style.display="inline"; setTimeout(()=>d.style.display="none",1600);
+});
+
+renderCats(); renderSubs(); renderBoard();
+</script>
+</body>
+</html>
