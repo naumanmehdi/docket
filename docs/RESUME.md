@@ -8,13 +8,14 @@ The **agent-first catalog** build is **largely complete and committed** at `~/He
 web app (warm-dark design-D port), docs, and seed all done. 75 tests pass; production build passes.
 
 ## The user's immediate next step
-**The user wants to TEST the whole dev build** — UI, flows, everything. To run it:
+**The user wants to DISCUSS the open items below first** (deploy/accounts, brand+domain, idea-lifecycle
+web UI, design-vision) — NOT test the build yet. In a new session, open with those decisions and let the
+user steer; do not jump to running/testing. To run the dev build when the user is ready:
 ```bash
 # ~/Hermes/apprank/app  (Node 20 via nvm, local Postgres up, DB seeded w/ 31 rows)
 DATABASE_URL=postgres://localhost:5432/apprank npm run dev --workspace @apprank/web
 # → http://localhost:3000
 ```
-If the user reports bugs, fix them. The dev server was left running; may need a fresh start.
 
 ## Open items / decisions (user-owned unless stated)
 1. **Deploy** — needs user accounts (GitHub repo + remote, Supabase project + `DATABASE_URL`, Vercel).
