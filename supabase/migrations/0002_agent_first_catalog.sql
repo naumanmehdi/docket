@@ -1,4 +1,4 @@
--- AppRank (working title) — plain Postgres, portable to Supabase as-is.
+-- docket (ex-AppRank) — plain Postgres, portable to Supabase as-is.
 -- Migration 0002: NEW agent-first catalog vision (SPEC §6, MAP D14).
 --  - listings: add kind/author/description/repo_url/spotlighted + idea-lifecycle columns,
 --    relax url & category to optional (ideas have neither).

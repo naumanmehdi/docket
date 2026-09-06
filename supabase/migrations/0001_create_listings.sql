@@ -1,4 +1,4 @@
--- AppRank (working title) — plain Postgres, portable to Supabase as-is.
+-- docket (ex-AppRank) — plain Postgres, portable to Supabase as-is.
 -- Migration 0001: listings + subscribers.
 
 create extension if not exists pgcrypto;

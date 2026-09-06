@@ -1,5 +1,11 @@
 # Daily Top-3 Post — X Thread Template (Layer 4)
 
+> **⚠️ ARCHIVED — NOT part of docket v1.** This is from the earlier *distribution/content-flywheel*
+> concept (Top-3 daily editorial on Product Hunt / Show HN / X). v1 explicitly excludes the
+> content-flywheel layer (see MAP.md / MVP.md / BRIEF). Keep only as reference for a possible later
+> content channel. If ever revived, it must be rewritten to fit the shipped 4-kind board, not the old
+> app-only launch directory.
+
 Use this once a day. Pick **3 tools** from Product Hunt / Show HN / X launches / the docket live board.
 Format follows the content rulebook (SPEC §21.2): 1 editorial pick + 1 rising + 1 SKIP verdict.
 **Never paid, always honest** — sponsorship buys placement, never the verdict.

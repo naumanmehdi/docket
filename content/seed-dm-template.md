@@ -1,5 +1,11 @@
 # Seed Cohort DM — Template (Layer 4)
 
+> **⚠️ ARCHIVED — NOT part of docket v1.** This is from the earlier *distribution/outreach* concept
+> (DMing 10–20 builders, free Top-3 feature, seeding the board). v1 explicitly excludes the
+> paid-distribution/content-flywheel/outreach layers (see MAP.md / MVP.md / BRIEF). Keep only as
+> reference for a possible later outreach channel. If ever revived, rewrite to fit the shipped 4-kind
+> board.
+
 Target: 10–20 builders launching **this week** (found via X launch posts, Product Hunt, Show HN).
 Personalize the first line. Keep it short, specific, and zero-pressure.
 

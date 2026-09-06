@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------
 // BRAND — single source of truth for the product name + copy (MVP §6).
-// The final name/domain is TBD; swap it HERE and nowhere else.
+// Name locked: docket (rundocket.xyz). Change it HERE and nowhere else.
 // ---------------------------------------------------------------------------
 export const BRAND = {
   name: "docket",
