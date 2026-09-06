@@ -1,6 +1,6 @@
 # ARCHITECTURE
 
-How the AppRank codebase is organised, so a human or an agent can orient in minutes — not hours.
+How the docket codebase is organised, so a human or an agent can orient in minutes — not hours.
 
 > This is the **engineering orientation doc**. For the product idea & decisions, see the planning docs
 > at `~/Hermes/apprank/apprank_idea/pm_wayfinder/`. For the future design ambition, see `DESIGN-VISION.md`.

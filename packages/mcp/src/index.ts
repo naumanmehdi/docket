@@ -87,6 +87,6 @@ if (isMain) {
   }
   const port = Number(process.env.PORT ?? "3001");
   startServer({ databaseUrl, mcpApiKey, port }).then((s) => {
-    console.log(`AppRank MCP server listening on ${s.url}`);
+    console.log(`docket MCP server listening on ${s.url}`);
   });
 }

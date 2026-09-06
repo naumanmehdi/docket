@@ -1,4 +1,4 @@
-# AppRank — Build Docs
+# docket — Build Docs
 
 **The one folder to read first.** If you're a human or an agent picking this project up fresh, start here.
 

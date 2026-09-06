@@ -3,9 +3,9 @@
 // The final name/domain is TBD; swap it HERE and nowhere else.
 // ---------------------------------------------------------------------------
 export const BRAND = {
-  name: "AppRank",
-  domain: "apprank.vercel.app",
-  handle: "@apprank",
+  name: "docket",
+  domain: "rundocket.xyz",
+  handle: "@rundocket",
   heroTitle: "The board your agent can publish to — and search.",
   heroSub:
     "Ideas, apps, MCP servers, and agent skills — published and found by humans and their AI agents. Tell your agent to list something, or to find you something to build.",

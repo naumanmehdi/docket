@@ -4,6 +4,6 @@
 // sync with packages/core/src/brand.ts (the agent/server-facing source).
 // ---------------------------------------------------------------------------
 export const SITE = {
-  name: "AppRank",
-  domain: "apprank.vercel.app",
+  name: "docket",
+  domain: "rundocket.xyz",
 };

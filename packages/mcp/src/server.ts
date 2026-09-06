@@ -79,7 +79,7 @@ function error(message: string): { content: { type: "text"; text: string }[]; is
 }
 
 /**
- * The AppRank MCP server (working title) — agent-first catalog tools:
+ * The docket MCP server — agent-first catalog tools:
  *  - publish          : add an idea/app/mcp/skill (agent can list anything)
  *  - search           : find across all kinds (incl. claimable ideas)
  *  - get_listing      : fetch one item by id

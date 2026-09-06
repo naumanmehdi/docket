@@ -186,7 +186,7 @@ export default function PublishModal({ open, onClose }: { open: boolean; onClose
             <div className="agent">“publish my idea about an <b>offline habit tracker for night-shift workers</b>”<br />→ it appears on the board as <b>open to build</b>.</div>
             <p>Works for apps, MCPs and skills too:</p>
             <div className="agent">“list my app” · “register this MCP” · “I made a Claude skill”</div>
-            <div className="agent">connect: <b>install apprank from https://{SITE.domain}/mcp</b></div>
+            <div className="agent">connect: <b>install docket from https://{SITE.domain}/mcp</b></div>
             <p className="hint2">Switching back to the web form publishes right here — same board.</p>
           </div>
         )}

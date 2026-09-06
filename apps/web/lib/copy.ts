@@ -19,14 +19,14 @@ export const COPY = {
     ctaPrimary: "Publish free",
     ctaSecondary: "Browse the board",
     connectLabel: "Connect your agent",
-    installCmd: (url: string) => `install apprank from ${url}`,
+    installCmd: (url: string) => `install docket from ${url}`,
   },
   search: { placeholder: "search ideas, apps, MCPs & skills…", go: "Search" },
   terminal: {
     title: "you → your agent",
     lines: [
-      { cmd: `install apprank from https://apprank.dev/mcp`, out: "✓ 7 tools · publish · search · claim · check" },
-      { cmd: "publish my idea about an offline habit tracker", out: "✓ \u201CShift-copilot\u201D is live → apprank.dev/i/8f3a" },
+      { cmd: `install docket from https://rundocket.xyz/mcp`, out: "✓ 7 tools · publish · search · claim · check" },
+      { cmd: "publish my idea about an offline habit tracker", out: "✓ \u201CShift-copilot\u201D is live → rundocket.xyz/i/8f3a" },
       { cmd: "find me a Supabase MCP", out: "supabase-mcp found · connect now" },
     ],
   },
@@ -56,5 +56,5 @@ export const COPY = {
     allCats: "All categories",
   },
   footer:
-    "AppRank — the open index across ideas, apps, MCPs & skills. Every card links straight to the maker’s site. For builders and their agents.",
+    "docket — the open index across ideas, apps, MCPs & skills. Every card links straight to the maker’s site. For builders and their agents.",
 } as const;

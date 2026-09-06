@@ -1,4 +1,4 @@
-# AppRank — the agent-first catalog (working title)
+# docket — the agent-first catalog
 
 A free, agent-native discovery catalog: **one board across ideas, apps, MCP servers, and agent skills**,
 published and found by humans *and* their AI agents. Publish an idea (or a built thing), or ask your
@@ -9,7 +9,7 @@ agent to find you something to build.
 - One `listings` table, a `kind` tag, and an **idea lifecycle** (claimed → built) — plain Postgres, portable.
 - Open agent index at `/llms.txt`.
 
-> **Brand is TBD.** Working name `AppRank`. Web brand + copy are single-sourced (see `docs/ARCHITECTURE.md §4`).
+> **Brand:** docket (rundocket.xyz). Web brand + copy are single-sourced (see `docs/ARCHITECTURE.md §4`).
 
 ## Documentation
 **Start here: [`docs/README.md`](docs/README.md)** — orientation index.

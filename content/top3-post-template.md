@@ -1,6 +1,6 @@
 # Daily Top-3 Post — X Thread Template (Layer 4)
 
-Use this once a day. Pick **3 tools** from Product Hunt / Show HN / X launches / the AppRank live board.
+Use this once a day. Pick **3 tools** from Product Hunt / Show HN / X launches / the docket live board.
 Format follows the content rulebook (SPEC §21.2): 1 editorial pick + 1 rising + 1 SKIP verdict.
 **Never paid, always honest** — sponsorship buys placement, never the verdict.
 

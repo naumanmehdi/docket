@@ -5,16 +5,16 @@ This is the content to paste. **Blocker:** needs the deployed server URL (final 
 
 ---
 
-**Name:** `apprank`
+**Name:** `docket`
 **Type:** Remote (Streamable HTTP)
-**Transport URL:** `https://{YOUR_DOMAIN}/mcp` (working placeholder: `https://apprank.vercel.app/mcp`)
+**Transport URL:** `https://{YOUR_DOMAIN}/mcp` (working placeholder: `https://rundocket.xyz/mcp`)
 **Auth:** `Authorization: Bearer <API_KEY>`
 
 **Short description**
 > The directory your agent can use. Submit an AI tool in ~2 minutes — your agent can list you — and appear on the live board instantly.
 
 **Long description**
-> AppRank is the first agent-native **launch** directory: a remote MCP server that lets your agent list your AI tool, verify it, and surface it on a live board — without you ever touching a website. Same database as the web form, so every listing is real.
+> docket is the first agent-native **launch** directory: a remote MCP server that lets your agent list your AI tool, verify it, and surface it on a live board — without you ever touching a website. Same database as the web form, so every listing is real.
 >
 > - `list_tool` — submit a tool (name, url, tagline, category, x_handle). Validates, writes, returns the id + status.
 > - `get_listing` — fetch a single listing by id.
@@ -31,13 +31,13 @@ This is the content to paste. **Blocker:** needs the deployed server URL (final 
 **Resources**
 | URI | Description |
 |---|---|
-| `apprank://listings/top-10` | Latest 10 live listings, newest first |
+| `docket://listings/top-10` | Latest 10 live listings, newest first |
 
 **Install snippet (Claude Code / Cursor → `.mcp.json`)**
 ```json
 {
   "mcpServers": {
-    "apprank": {
+    "docket": {
       "url": "https://{YOUR_DOMAIN}/mcp",
       "headers": { "Authorization": "Bearer YOUR_API_KEY" }
     }

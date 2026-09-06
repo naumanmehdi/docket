@@ -5,8 +5,7 @@ export const runtime = "nodejs";
 
 /**
  * /llms.txt — the open, agent-readable index + install manifest (SPEC §8, D8/D13).
- * An agent told to "find me an idea / an MCP / a skill" (or to install the AppRank
- * MCP) can pull this single plain-text file through its normal tooling and act on
+ * An agent told to "find me an idea / an MCP / a skill" (or to install the docket MCP) can pull this single plain-text file through its normal tooling and act on
  * it without ever visiting the rendered site.
  */
 export async function GET() {

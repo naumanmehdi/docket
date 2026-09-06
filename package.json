@@ -2,7 +2,7 @@
   "name": "apprank",
   "version": "0.1.0",
   "private": true,
-  "description": "AppRank — the directory your agent can use. Working title; brand TBD (see packages/core/src/brand.ts).",
+  "description": "docket — the agent-first catalog across ideas, apps, MCPs & skills (rundocket.xyz).",
   "workspaces": [
     "packages/*",
     "apps/*"

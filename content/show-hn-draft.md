@@ -19,7 +19,7 @@ Post on: https://news.ycombinator.com (Show HN). Title ~80 chars.
 >
 > **Stack (all free, Pakistan-friendly, migration-lean):** Next.js on Vercel, Supabase/Postgres, official MCP TypeScript SDK, Node 20. No Stripe (Pakistan) — payments are a later layer behind a thin billing abstraction.
 >
-> **Why agents, why now:** every directory still makes you fill a form. Stork does agent *discovery*; this is agent *launch* — the verbs are different. A builder in Claude Code should be able to say "list my tool on AppRank" and have it done.
+> **Why agents, why now:** every directory still makes you fill a form. Stork does agent *discovery*; this is agent *launch* — the verbs are different. A builder in Claude Code should be able to say "list my tool on docket" and have it done.
 >
 > **Honest scope:** it's day-one MVP — free listings, a live board, email capture. No blasts, no auctions, no receipts yet. Those are the next layers.
 >
@@ -28,5 +28,5 @@ Post on: https://news.ycombinator.com (Show HN). Title ~80 chars.
 ---
 
 ### Notes
-- Replace working title **AppRank** and the URL with the final brand before posting (single swap in `packages/core/src/brand.ts`).
+- **Brand locked 2026-09-06: `docket` / rundocket.xyz.** (single swap in `packages/core/src/brand.ts`).
 - The MCP angle is the technical story HN ranks for — lead with it.
