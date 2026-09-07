@@ -11,9 +11,13 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   if (!databaseUrl) {
     throw new Error("DATABASE_URL is not set");
   }
+  const mcpApiKey = env.MCP_API_KEY ?? "";
+  if (!mcpApiKey) {
+    throw new Error("MCP_API_KEY is not set");
+  }
   return {
     databaseUrl,
-    mcpApiKey: env.MCP_API_KEY ?? "dev-key",
+    mcpApiKey,
     brand: BRAND,
   };
 }
