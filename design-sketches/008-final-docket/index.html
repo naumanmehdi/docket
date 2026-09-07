@@ -266,6 +266,17 @@
   .mtab { display: flex; gap: 8px; margin: 20px 0 6px; }
   .mtab button { flex: 1; padding: 11px; border-radius: 12px; border: 1px solid var(--hair); background: var(--paper); color: var(--mut); font-weight: 600; font-size: 14px; cursor: pointer; font-family: inherit; transition: background .3s var(--ease), color .3s; }
   .mtab button.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .step-intro { color: var(--mut); font-size: 13px; margin: 18px 0 2px; }
+  .step { position: relative; padding: 14px 0 4px 40px; margin-top: 6px; }
+  .step + .step { border-top: 1px dashed var(--hair); }
+  .step-n {
+    position: absolute; left: 0; top: 16px; width: 26px; height: 26px; border-radius: 50%;
+    background: var(--ember-soft); color: var(--ember-deep); font-family: "DM Mono", monospace;
+    font-size: 12.5px; font-weight: 500; display: grid; place-items: center;
+  }
+  .mreq { color: var(--ember-deep); font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+  .step .mlab { margin-top: 10px; }
+  .step .mlab:first-of-type { margin-top: 0; }
   .mlab { display: block; font-size: 12.5px; font-weight: 600; color: var(--ink); margin: 16px 0 6px; }
   .minput { width: 100%; background: var(--paper); border: 1px solid var(--hair); border-radius: 12px; color: var(--ink); font-size: 14.5px; padding: 11px 13px; outline: none; font-family: inherit; transition: border-color .3s; }
   .minput:focus { border-color: var(--ember); }
@@ -349,8 +360,12 @@
       <div class="doubled"><div class="inner">
         <div class="t-head"><span class="t">you → your agent → docket</span><span class="live">live</span></div>
         <div class="t-body">
-          <div class="ln"><span class="prompt">➜</span><span class="cmd">publish my idea about an offline habit tracker</span><span class="out"><span class="ok">✓</span> shift-copilot live → /i/8f3a</span></div>
+          <div class="ln"><span class="prompt">➜</span><span class="out">step 1 — connect your agent</span></div>
+          <div class="ln"><span class="prompt">➜</span><span class="cmd">install docket from https://rundocket.xyz/mcp</span></div>
+          <div class="ln"><span class="prompt">➜</span><span class="out">step 2 — publish or find</span></div>
+          <div class="ln"><span class="prompt">➜</span><span class="cmd">publish my idea about an offline habit tracker</span><span class="out"><span class="ok">✓</span> shift-copilot live → open to build</span></div>
           <div class="ln"><span class="prompt">➜</span><span class="cmd">find me a Supabase MCP</span><span class="out"><span class="ok">✓</span> supabase-mcp · connect now</span></div>
+          <div class="ln"><span class="prompt">➜</span><span class="out">step 3 — never miss a claim</span></div>
           <div class="ln"><span class="prompt">➜</span><span class="cmd">check my ideas</span><span class="out"><span class="ok">✓</span> 1 claimed · 1 shipped</span></div>
           <div class="ln"><span class="prompt">➜</span><span class="cmd"></span><span class="caret" /></div>
         </div>
@@ -450,29 +465,51 @@
 <div class="modal-mask" id="modal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <div class="mhead"><h3>Publish to docket</h3><button class="x" onclick="closeModal()">×</button></div>
-    <div class="mtab"><button class="on" id="tabf" onclick="switchTab('form')">Web form</button><button id="taba" onclick="switchTab('agent')">Or ask your agent</button></div>
+    <div class="mtab"><button class="on" id="tabf" onclick="switchTab('form')">Web</button><button id="taba" onclick="switchTab('agent')">Or ask your agent</button></div>
     <div id="paneForm">
-      <label class="mlab">What are you publishing?</label>
-      <select class="minput"><option>💡 Idea — an unbuilt thought</option><option>App — a built product</option><option>MCP server</option><option>Agent skill (Claude / OpenAI-compatible)</option></select>
-      <label class="mlab">Name</label>
-      <input class="minput" placeholder="e.g. Offline-first habit tracker" />
-      <label class="mlab">One-line problem / pitch</label>
-      <input class="minput" placeholder="The problem it solves / who it’s for" />
-      <label class="mlab">Description — optional</label>
-      <textarea class="minput" rows="3" placeholder="Who it’s for, rough requirements, constraints…"></textarea>
-      <label class="mlab">Your handle (X / GitHub)</label>
-      <input class="minput" placeholder="@yourhandle" />
-      <button class="pbtn">Publish idea →</button>
-      <div class="msg ok" style="margin-top:14px">“Offline habit tracker” is on the board, open to build.</div>
+      <p class="step-intro">Three quick steps — publish in under a minute.</p>
+      <div class="step">
+        <span class="step-n">1</span>
+        <label class="mlab">What are you publishing? <span class="mreq">required</span></label>
+        <select class="minput"><option>Idea — an unbuilt thought</option><option>App — a built product</option><option>MCP server</option><option>Agent skill (Claude / OpenAI-compatible)</option></select>
+      </div>
+      <div class="step">
+        <span class="step-n">2</span>
+        <label class="mlab">Name <span class="mreq">required</span></label>
+        <input class="minput" placeholder="e.g. Offline-first habit tracker" />
+        <label class="mlab">One-line pitch <span class="mreq">required</span></label>
+        <input class="minput" placeholder="What it is — or for an idea, the problem it solves" />
+        <label class="mlab">Description — optional</label>
+        <textarea class="minput" rows="3" placeholder="Who it’s for, rough requirements, constraints…"></textarea>
+      </div>
+      <div class="step">
+        <span class="step-n">3</span>
+        <label class="mlab">Your handle (X / GitHub) <span class="mreq">required</span></label>
+        <input class="minput" placeholder="@yourhandle" />
+        <button class="pbtn">Publish to docket →</button>
+        <div class="msg ok" style="margin-top:14px">You're on the board — open to build or live to the maker's site.</div>
+      </div>
     </div>
     <div id="paneAgent" style="display:none">
       <div class="agentpane">
-        <p>Prefer your agent to do it? Just say one line where you already work:</p>
-        <div class="agent">“publish my idea about an <b>offline habit tracker for night-shift workers</b>”<br />→ it appears on the board as <b>open to build</b>.</div>
-        <p>Works for apps, MCPs and skills too:</p>
-        <div class="agent">“list my app” · “register this MCP” · “I made a Claude skill”</div>
-        <div class="agent">connect: <b>install docket from https://rundocket.xyz/mcp</b></div>
-        <p class="hint2">Switching back to the web form publishes right here — same board.</p>
+        <p class="step-intro">Your agent does the publish — three steps, one sentence each.</p>
+        <div class="step">
+          <span class="step-n">1</span>
+          <label class="mlab">Connect your agent</label>
+          <div class="agent">Add a remote MCP server: <b>install docket from https://rundocket.xyz/mcp</b></div>
+        </div>
+        <div class="step">
+          <span class="step-n">2</span>
+          <label class="mlab">Say what you're publishing</label>
+          <div class="agent">“publish my idea about an <b>offline habit tracker for night-shift workers</b>” → it appears on the board as <b>open to build</b>.</div>
+          <div class="agent">Works for built things too: “list my app” · “register this MCP” · “I made a Claude skill”</div>
+        </div>
+        <div class="step">
+          <span class="step-n">3</span>
+          <label class="mlab">Check back anytime</label>
+          <div class="agent">“check my ideas” → <b>see who claimed, what shipped</b>. “are you working on X?” → file feedback, read privately.</div>
+        </div>
+        <p class="hint2">Switching to Web publishes the same way — same board.</p>
       </div>
     </div>
   </div>
