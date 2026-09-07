@@ -8,7 +8,7 @@ type Kind = "idea" | "app" | "mcp" | "skill";
 const KINDS: Kind[] = ["idea", "app", "mcp", "skill"];
 
 const KIND_LABEL: Record<Kind, string> = {
-  idea: "💡 Idea — an unbuilt thought",
+  idea: "Idea — an unbuilt thought",
   app: "App — a built product",
   mcp: "MCP server",
   skill: "Agent skill (Claude / OpenAI-compatible)",
@@ -100,94 +100,114 @@ export default function PublishModal({ open, onClose }: { open: boolean; onClose
 
         {/* tabs */}
         <div className="mtab">
-          <button className={tab === "form" ? "on" : ""} onClick={() => setTab("form")}>Web form</button>
+          <button className={tab === "form" ? "on" : ""} onClick={() => setTab("form")}>Web</button>
           <button className={tab === "agent" ? "on" : ""} onClick={() => setTab("agent")}>Or ask your agent</button>
         </div>
 
         {tab === "form" ? (
           <>
-            {/* kind selector */}
-            <label className="mlab">What are you publishing?</label>
-            <select
-              className="minput"
-              value={kind}
-              onChange={(e) => { setKind(e.target.value as Kind); setCats([]); setCatQuery(""); }}
-            >
-              {KINDS.map((k) => <option key={k} value={k}>{KIND_LABEL[k]}</option>)}
-            </select>
+            <p className="step-intro">Three quick steps — publish in under a minute.</p>
+            <div className="step">
+              <span className="step-n">1</span>
+              <label className="mlab">What are you publishing? <span className="mreq">required</span></label>
+              <select
+                className="minput"
+                value={kind}
+                onChange={(e) => { setKind(e.target.value as Kind); setCats([]); setCatQuery(""); }}
+              >
+                {KINDS.map((k) => <option key={k} value={k}>{KIND_LABEL[k]}</option>)}
+              </select>
+            </div>
 
-            <label className="mlab">{NAME_LABEL[kind]}</label>
-            <input className="minput" placeholder={NAME_PH[kind]} value={name} onChange={(e) => setName(e.target.value)} />
+            <div className="step">
+              <span className="step-n">2</span>
+              <label className="mlab">{NAME_LABEL[kind]} <span className="mreq">required</span></label>
+              <input className="minput" placeholder={NAME_PH[kind]} value={name} onChange={(e) => setName(e.target.value)} />
 
-            <label className="mlab">{TAG_LABEL[kind]}</label>
-            <input className="minput" placeholder={isIdea ? "The problem it solves / who it’s for" : "One line: what it is"} value={tag} onChange={(e) => setTag(e.target.value)} />
+              <label className="mlab">{TAG_LABEL[kind]} <span className="mreq">required</span></label>
+              <input className="minput" placeholder={isIdea ? "The problem it solves / who it's for" : "One line: what it is"} value={tag} onChange={(e) => setTag(e.target.value)} />
 
-            {needsUrl && (
-              <>
-                <label className="mlab">URL</label>
-                <input className="minput" placeholder="https://…" value={url} onChange={(e) => setUrl(e.target.value)} />
-              </>
-            )}
+              {needsUrl && (
+                <>
+                  <label className="mlab">URL</label>
+                  <input className="minput" placeholder="https://…" value={url} onChange={(e) => setUrl(e.target.value)} />
+                </>
+              )}
 
-            {!isIdea && (
-              <>
-                <label className="mlab">Category — optional, up to 3</label>
-                <div className="combo" ref={menuRef}>
-                  <input
-                    className="minput"
-                    placeholder="Search categories…"
-                    value={catQuery}
-                    onFocus={() => setMenuOpen(true)}
-                    onChange={(e) => { setCatQuery(e.target.value); setMenuOpen(true); }}
-                  />
-                  <div className={`cmenu${menuOpen ? " open" : ""}`}>
-                    {catMatches.length === 0 ? (
-                      <div className="none">No matches</div>
-                    ) : catMatches.map((c) => (
-                      <div
-                        key={c}
-                        className={`mi ${cats.includes(c) ? "sel" : ""} ${cats.length >= 3 && !cats.includes(c) ? "dim" : ""}`}
-                        onClick={() => addCat(c)}
-                      >
-                        {c}
-                      </div>
-                    ))}
+              {!isIdea && (
+                <>
+                  <label className="mlab">Category — optional, up to 3</label>
+                  <div className="combo" ref={menuRef}>
+                    <input
+                      className="minput"
+                      placeholder="Search categories…"
+                      value={catQuery}
+                      onFocus={() => setMenuOpen(true)}
+                      onChange={(e) => { setCatQuery(e.target.value); setMenuOpen(true); }}
+                    />
+                    <div className={`cmenu${menuOpen ? " open" : ""}`}>
+                      {catMatches.length === 0 ? (
+                        <div className="none">No matches</div>
+                      ) : catMatches.map((c) => (
+                        <div
+                          key={c}
+                          className={`mi ${cats.includes(c) ? "sel" : ""} ${cats.length >= 3 && !cats.includes(c) ? "dim" : ""}`}
+                          onClick={() => addCat(c)}
+                        >
+                          {c}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-                {cats.length > 0 && (
-                  <div className="selcats">
-                    {cats.map((c) => (
-                      <span key={c} className="sc">
-                        {c}
-                        <button className="x" onClick={() => setCats((p) => p.filter((x) => x !== c))} aria-label="Remove">×</button>
-                      </span>
-                    ))}
-                    <span className="catcount">{cats.length} of 3 used</span>
-                  </div>
-                )}
-              </>
-            )}
+                  {cats.length > 0 && (
+                    <div className="selcats">
+                      {cats.map((c) => (
+                        <span key={c} className="sc">
+                          {c}
+                          <button className="x" onClick={() => setCats((p) => p.filter((x) => x !== c))} aria-label="Remove">×</button>
+                        </span>
+                      ))}
+                      <span className="catcount">{cats.length} of 3 used</span>
+                    </div>
+                  )}
+                </>
+              )}
 
-            <label className="mlab">Description — optional</label>
-            <textarea className="minput" rows={3} placeholder={isIdea ? "Who it’s for, rough requirements, constraints…" : "A bit more about it"} value={desc} onChange={(e) => setDesc(e.target.value)} />
+              <label className="mlab">Description — optional</label>
+              <textarea className="minput" rows={3} placeholder={isIdea ? "Who it's for, rough requirements, constraints…" : "A bit more about it"} value={desc} onChange={(e) => setDesc(e.target.value)} />
+            </div>
 
-            <label className="mlab">Your handle (X / GitHub)</label>
-            <input className="minput" placeholder="@yourhandle" value={author} onChange={(e) => setAuthor(e.target.value)} />
-
-            <button className="pbtn" onClick={submit} disabled={busy}>
-              {busy ? "Publishing…" : `Publish ${isIdea ? "idea" : "free"} →`}
-            </button>
+            <div className="step">
+              <span className="step-n">3</span>
+              <label className="mlab">Your handle (X / GitHub) <span className="mreq">required</span></label>
+              <input className="minput" placeholder="@yourhandle" value={author} onChange={(e) => setAuthor(e.target.value)} />
+              <button className="pbtn" onClick={submit} disabled={busy}>
+                {busy ? "Publishing…" : `Publish ${isIdea ? "idea" : "free"} →`}
+              </button>
+            </div>
 
             {msg && <div className={`msg ${msg.kind}`}>{msg.text}</div>}
           </>
         ) : (
           <div className="agentpane">
-            <p>Prefer your agent to do it? Just say one line where you already work:</p>
-            <div className="agent">“publish my idea about an <b>offline habit tracker for night-shift workers</b>”<br />→ it appears on the board as <b>open to build</b>.</div>
-            <p>Works for apps, MCPs and skills too:</p>
-            <div className="agent">“list my app” · “register this MCP” · “I made a Claude skill”</div>
-            <div className="agent">connect: <b>install docket from https://{SITE.domain}/mcp</b></div>
-            <p className="hint2">Switching back to the web form publishes right here — same board.</p>
+            <p className="step-intro">Your agent does the publish — three steps, one sentence each.</p>
+            <div className="step">
+              <span className="step-n">1</span>
+              <label className="mlab">Connect your agent</label>
+              <div className="agent">Add a remote MCP server: <b>install docket from https://{SITE.domain}/mcp</b></div>
+            </div>
+            <div className="step">
+              <span className="step-n">2</span>
+              <label className="mlab">Say what you're publishing</label>
+              <div className="agent">"publish my idea about an <b>offline habit tracker for night-shift workers</b>"<br />→ it appears on the board as <b>open to build</b>.</div>
+              <div className="agent">Works for built things too: "list my app" · "register this MCP" · "I made a Claude skill"</div>
+            </div>
+            <div className="step">
+              <span className="step-n">3</span>
+              <label className="mlab">Check back anytime</label>
+              <div className="agent">"check my ideas" → <b>see who claimed, what shipped</b>. "are you working on X?" → file feedback, read privately.</div>
+            </div>
+            <p className="hint2">Switching to Web publishes the same way — same board.</p>
           </div>
         )}
       </div>

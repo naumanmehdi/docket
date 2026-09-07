@@ -74,10 +74,10 @@ export default function Catalog({ rows }: { rows: ListingRow[] }) {
             const label = COPY.catNames[k];
             const isAll = k === "all";
             const cls = `cat ${k}${activeCat === k ? " active" : ""}`;
-            const icoColor = isAll ? "var(--gold)" : undefined;
+            const icoColor = isAll ? "var(--ember)" : undefined;
             const icon = isAll ? "✦" : k.charAt(0).toUpperCase();
             return (
-              <button key={k} className={cls} onClick={() => pickCat(k)} aria-pressed={activeCat === k}>
+              <button key={k} className={cls} onClick={() => pickCat(k)} aria-pressed={activeCat === k} data-label={label}>
                 <div className="ico" style={icoColor ? { color: icoColor } : undefined}>{icon}</div>
                 <div className="ct">{label}</div>
                 <div className="cd">{COPY.catDescs[k]}</div>
