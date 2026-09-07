@@ -35,12 +35,9 @@ Read this + `ARCHITECTURE.md` first, then `git status`. Don't re-derive anything
 - gh CLI authenticated, `workflow` scope granted, repo `naumanmehdi/docket` created and pushed
 
 **Supabase:** project `mgzjmjjrcuiwdvjvonzn` (project name: "docket")
-- Personal access token: `[REDACTED]` (keep private)
-- Database password: `[REDACTED]`
-- Connection string (pooler):
-  ```
-  postgresql://postgres.mgzjmjjrcuiwdvjvonzn:[REDACTED]@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres
-  ```
+- Personal access token: see `~/Hermes/notes/app_accounts.md` (kept out of git)
+- Database password: see `~/Hermes/notes/app_accounts.md`
+- Connection string (pooler): see `~/Hermes/notes/app_accounts.md`
 - CLI: `supabase login` via `SUPABASE_ACCESS_TOKEN`, `supabase link --project-ref mgzjmjjrcuiwdvjvonzn`
 - Migrations pushed (`supabase db push`), 31 rows seeded
 
