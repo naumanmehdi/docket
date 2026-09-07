@@ -25,10 +25,16 @@ Read this + `ARCHITECTURE.md` first, then `git status`. Don't re-derive anything
   - GitHub auto-deploy NOT connected (Vercel OAuth identity lacks repo write access)
   - Custom domain `rundocket.xyz` NOT yet pointed (deferred to after test verify)
 
-### Step B deferred — MCP `/mcp` route
-- The MCP server currently runs as a standalone Node process (`node dist/index.js`, port 3001)
-- To host it on Vercel, an `/mcp` API route needs to be added inside `apps/web` so the MCP
-  rides the same Vercel deployment. This is the next build step when the user is ready.
+### Step B complete — MCP `/mcp` route (2026-09-07)
+- `apps/web/app/api/mcp/route.ts` hosts the same 7-tool MCP server on the Vercel deployment
+  (`/mcp` rewrites here via vercel.json). **Stateless** JSON-response mode: a fresh transport +
+  server per request (required on serverless — `Protocol` can't reuse a transport). Auth = `MCP_API_KEY`
+  bearer, enforced at the edge (401 otherwise). `@apprank/mcp` + SDK added to web deps.
+- Verified live: real client handshake on the prod URL — listTools (7), publish, claim, get_listing
+  all work against the Supabase DB. Env: `MCP_API_KEY` set on Vercel (all 3 envs), also in `.env.local`.
+- Connect URL for agents: `https://rundocket.xyz/mcp` (or the temp `.vercel.app` while unpointed);
+  llms.txt install manifest already advertises it. Standalone process entry still available locally.
+- Standalone process (`node dist/index.js:3001`) remains as the local/dev server — not replaced.
 
 ## Accounts & secrets (for next session setup)
 **GitHub:** `naumanmehdi` (note: accounts doc had `nauman388` — actual login is `naumanmehdi`)
@@ -51,8 +57,9 @@ Read this + `ARCHITECTURE.md` first, then `git status`. Don't re-derive anything
 Full account log kept at `~/Hermes/notes/app_accounts.md` — never pushed to GitHub.
 
 ## Open items / decisions (next session)
-1. **Step B — MCP `/mcp` route:** build the `/mcp` API route inside `apps/web` so agents can connect
-   to the deployed Vercel host (this is the real agent-native front door).
+1. **Step B — MCP `/mcp` route:** ✅ **DONE (2026-09-07).** Route ships and is verified live —
+   `https://rundocket.xyz/mcp` is the agent front door. Next natural check: point the custom domain so
+   that URL (not the temp `.vercel.app` one) is what clients/llms.txt use.
 2. **Idea-lifecycle web UI** — OPEN. Lifecycle works agent/MCP-side only; web shows state but no
    claim/build buttons. Decide if a human web UI is wanted (would be small). `ARCHITECTURE.md §10`.
 3. **Design-vision sprint** — the high-end playful/motion "mind-blown" redesign (separate future
@@ -60,6 +67,7 @@ Full account log kept at `~/Hermes/notes/app_accounts.md` — never pushed to Gi
 4. **GitHub auto-deploy integration** — requires giving Vercel's GitHub app write access to the repo,
    or using a Vercel GitHub App installation on the `naumanmehdi` account.
 5. **Custom domain** — point `rundocket.xyz` at the Vercel project after test deploy is verified.
+   (This is the one thing left to finish the agent front door — `/mcp` is live on the temp URL.)
 
 ## Files that matter (quick index)
 - `docs/README.md` → orientation index

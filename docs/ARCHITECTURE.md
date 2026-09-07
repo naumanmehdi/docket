@@ -23,6 +23,7 @@ app/                      <- this repo (git), lives at ~/Hermes/apprank/app
 │   ├── app/               page.tsx (server, fetches rows) · globals.css (theme)
 │   │   _components/       Landing, Catalog, PublishModal  (client, "use client")
 │   │   api/listings/      POST publish (rate-limited)
+│   │   api/mcp/           POST/GET (stateless MCP over Streamable HTTP, /mcp rewrite)
 │   │   llms.txt/          open agent index + install manifest
 │   └── lib/               site.ts (web brand) · copy.ts (all copy) · taxonomy.ts (categories) · listing.ts (row map)
 ├── supabase/migrations/   0001, 0002 (plain Postgres, portable)

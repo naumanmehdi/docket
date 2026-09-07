@@ -11,3 +11,5 @@ out/
 coverage/
 .vercel/
 supabase/.temp/
+.vercel
+.env*
