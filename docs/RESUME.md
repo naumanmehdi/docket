@@ -1,109 +1,84 @@
-# RESUME HERE — handoff for the next session (updated 2026-09-06)
+# RESUME HERE — handoff for the next session (updated 2026-09-07, session ~1M)
 
-Read this + `ARCHITECTURE.md` first, then `git status`. Don't re-derive anything — it's all below.
+Read this + `ARCHITECTURE.md` + `SECURITY.md` first, then `git status`. Don't re-derive anything — it's all below.
 
-## Brand decided
-**Name: `docket` · Domain: `rundocket.xyz`** (lowercase wordmark everywhere). Swap lives in
-`packages/core/src/brand.ts` + `apps/web/lib/site.ts`.
+## Current git state (IMPORTANT)
+- **You are on branch `redesign/soft-cream`** — this holds ALL the recent work (design port, rename,
+  feedback, security). It is **7 commits ahead of `main`** and **NOT merged, NOT pushed**.
+- `origin/main` = old clean deploy state (Step B live on temp URL). The new branch work is local-only.
+- **Next step is a decision, not a build:** merge `redesign/soft-cream` → `main`, set `MCP_ADMIN_KEY`,
+  apply migration 0003, deploy. See "Open items / decisions".
 
-## Where the project stands (end of today)
+## Brand
+**Name: `docket` · Domain: `rundocket.xyz`** (lowercase everywhere). npm scope was renamed
+`@apprank/*` → `@docket/*` across ALL code this session (imports, package.json ×3, vercel.json, CI,
+seed/tests) + `createApprankServer` → `createDocketServer`. Build + 75 tests green under new scope.
 
-### Built and committed
-- Monorepo: `packages/core` (shared data layer + zod validation + brand), `packages/mcp` (7-tool MCP server),
-  `apps/web` (Next.js 15 + React 19 warm-dark board).
-- 75 tests pass; production build passes under Node 20.
-- Supabase migrations applied (`listings` + `claim_log` tables). Seed: 31 listings across 4 kinds.
-- All user-facing copy rewritten to match the shipped 4-kind board.
-- Old content-flywheel/outreach templates marked ARCHIVED (not part of v1).
+## What was done since the last handoff (2026-09-07)
+### FEEDBACK feature — completed + wired into the app
+- `feedback` table (SEPARATE from `listings` — never on the public board/search). Migration `0003_feedback.sql`.
+- Intake: `POST /api/feedback` (web, rate-limited 15/10min) + MCP `feedback` tool (public submit).
+- Digest: MCP `top_feedback` (OWNER-only, gated by `MCP_ADMIN_KEY`). Public key can submit, cannot read.
+- **No tool lock-in:** digest is a plain Postgres view `feedback_top_asks` — `select * from feedback_top_asks;`.
+- Known limitation (do not ship silently): clustering is a cheap prefix bucket — exact repeats collapse,
+  rephrased variants split. Upgrade to `pg_trgm`/embeds when volume grows.
+- The "Your note" feedback form is now LIVE in the web app (wired to POST /api/feedback).
 
-### Step A complete — test deploy live
-- **GitHub repo:** https://github.com/naumanmehdi/docket (pushed from `~/Hermes/apprank/app`)
-- **Supabase:** project `mgzjmjjrcuiwdjvjonzn` (named "docket"), pooler connection set up
-- **Vercel test deploy:** https://docket-9izw3lue6-naumandevs-projects.vercel.app
-  - Board renders, `llms.txt` serves, DATABASE_URL env set (secret), 31 seeded rows visible
-  - Deployment protection disabled for testing
-  - GitHub auto-deploy NOT connected (Vercel OAuth identity lacks repo write access)
-  - Custom domain `rundocket.xyz` NOT yet pointed (deferred to after test verify)
+### DESIGN — locked 008 + PORTED into the app
+- Locked direction: **soft-cream + docket-tab motif** (Editorial Luxury, light). Comp at
+  `design-sketches/008-final-docket/index.html`.
+- **Ported into the live app** (front-end only — globals.css + components + copy; data/API/MCP untouched):
+  - `globals.css`: warm cream paper `#fbf7ef` + espresso ink `#26190f` + single ember accent `#d9743f`,
+    de-pilled radii, warm shadows, film grain, editorial split hero, floating island nav,
+    binder-tab category cards, docket-edge board rows, structured footer + feedback styling.
+  - `Landing.tsx`: 2-col editorial hero, step-by-step terminal (install/publish/find/check), live FeedbackNote,
+    structured footer with "Made with ❤️ by @naumanmehdi" credit.
+  - `Catalog.tsx`: category buttons emit `data-label` for binder tabs; active Everything wide (4-col).
+  - `PublishModal.tsx`: "Web" tab + 3-step form (kind → fields → handle) + agent step pane; no emoji.
+  - `copy.ts`: reorganized into navigable structure; `layout.tsx` fonts → Plus Jakarta + Fraunces italics.
+- Verified: build clean, 75 tests pass, visual check (cream, tabs, no breakage).
 
-### Step B complete — MCP `/mcp` route (2026-09-07)
-- `apps/web/app/api/mcp/route.ts` hosts the same 7-tool MCP server on the Vercel deployment
-  (`/mcp` rewrites here via vercel.json). **Stateless** JSON-response mode: a fresh transport +
-  server per request (required on serverless — `Protocol` can't reuse a transport). Auth = `MCP_API_KEY`
-  bearer, enforced at the edge (401 otherwise). `@docket/mcp` + SDK added to web deps.
-- Verified live: real client handshake on the prod URL — listTools (7), publish, claim, get_listing
-  all work against the Supabase DB. Env: `MCP_API_KEY` set on Vercel (all 3 envs), also in `.env.local`.
-- Connect URL for agents: `https://rundocket.xyz/mcp` (or the temp `.vercel.app` while unpointed);
-  llms.txt install manifest already advertises it. Standalone process entry still available locally.
-- Standalone process (`node dist/index.js:3001`) remains as the local/dev server — not replaced.
+### SECURITY — audited + hardened (see SECURITY.md for full posture)
+- SQL injection SAFE (all queries parameterized; verified live — `' OR 1=1 --` stored inert).
+- XSS SAFE (no sinks; React escapes; verified live with script/onerror payloads).
+- Prompt injection: MCP `search`/`get_listing`/`my_ideas` tool descriptions now label content UNTRUSTED DATA.
+- Removed `config.ts` `?? "dev-key"` fallback (now fail-closed if MCP_API_KEY unset).
+- Scrapped leaked Supabase creds from git history + expunged local leftovers (reflog/original). Remote clean.
+- MCP two-tier auth (public/admin) verified live.
+- **`npm audit` = 8 issues (5 mod, 2 high, 1 crit) — ALL dev/test-only** (vitest UI [crit], esbuild, postcss,
+  qs). None at runtime routes. Pre-launch: run `npm audit fix --force` then re-test.
 
-## Accounts & secrets (for next session setup)
-**GitHub:** `naumanmehdi` (note: accounts doc had `nauman388` — actual login is `naumanmehdi`)
-- gh CLI authenticated, `workflow` scope granted, repo `naumanmehdi/docket` created and pushed
-
-**Supabase:** project `mgzjmjjrcuiwdvjvonzn` (project name: "docket")
-- Personal access token: see `~/Hermes/notes/app_accounts.md` (kept out of git)
-- Database password: see `~/Hermes/notes/app_accounts.md`
-- Connection string (pooler): see `~/Hermes/notes/app_accounts.md`
-- CLI: `supabase login` via `SUPABASE_ACCESS_TOKEN`, `supabase link --project-ref mgzjmjjrcuiwdvjvonzn`
-- Migrations pushed (`supabase db push`), 31 rows seeded
-
-**Vercel:** user `nauman-dev`, project `naumandevs-projects/docket`
-- CLI authenticated
-- Project linked, deployed to temp `.vercel.app` domain
-- `DATABASE_URL` set as Vercel Secret across all environments
-- GitHub Git integration NOT connected (Vercel identity lacks repo write access; deploys via CLI)
-
-## Accounts file (outside git repo)
-Full account log kept at `~/Hermes/notes/app_accounts.md` — never pushed to GitHub.
+## Accounts & secrets (unchanged)
+- **GitHub:** `naumanmehdi` (doc said `nauman388`; actual login `naumanmehdi`). Repo `naumanmehdi/docket`.
+- **Supabase:** project `mgzjmjjrcuiwdvjvonzn` ("docket"). Token/password/conn → `~/Hermes/notes/app_accounts.md`.
+- **Vercel:** user `nauman-dev`, project `naumandevs-projects/docket`. `DATABASE_URL` set (all envs).
 
 ## Open items / decisions (next session)
-1. **Step B — MCP `/mcp` route:** ✅ **DONE (2026-09-07).** Route ships and is verified live —
-   `https://rundocket.xyz/mcp` is the agent front door. Next natural check: point the custom domain so
-   that URL (not the temp `.vercel.app` one) is what clients/llms.txt use.
-2. **Idea-lifecycle web UI** — OPEN. Lifecycle works agent/MCP-side only; web shows state but no
-   claim/build buttons. Decide if a human web UI is wanted (would be small). `ARCHITECTURE.md §10`.
-3. **Design-vision sprint** — the high-end playful/motion "mind-blown" redesign (separate future
-   workstream). `DESIGN-VISION.md`. Launch on D first; redesign is a front-end-only swap.
-4. **GitHub auto-deploy integration** — requires giving Vercel's GitHub app write access to the repo,
-   or using a Vercel GitHub App installation on the `naumanmehdi` account.
-5. **Custom domain** — point `rundocket.xyz` at the Vercel project after test deploy is verified.
-   (This is the one thing left to finish the agent front door — `/mcp` is live on the temp URL.)
-6. **Feedback feature — DONE on branch `redesign/soft-cream` (2026-09-07).** Private intake + owner digest.
-   - `feedback` table (separate from `listings` — feedback NEVER appears on the public board/search).
-   - Intake: `POST /api/feedback` (web, rate-limited) + MCP `feedback` tool (public).
-   - Digest: MCP `top_feedback` (OWNER-only, gated by `MCP_ADMIN_KEY`). External clients can submit
-     but CANNOT read the private digest.
-   - **No tool lock-in:** the digest is a plain Postgres view `feedback_top_asks` — readable with
-     `select * from feedback_top_asks;` via psql / Supabase dashboard / any Postgres client, or
-     `pg_dump` for migration. Agent tools are convenience, never the only exit door.
-   - **Known limitation (do not silently ship):** clustering is a cheap prefix bucket — exact/near-exact
-     repeats collapse, but rephrased variants of the same ask split into separate rows. Fine at small
-     volume; upgrade to `pg_trgm` similarity or embed-based clustering when feedback actually grows.
-   - Deploy pending: set `MCP_ADMIN_KEY` on Vercel (currently only `MCP_API_KEY` set). The "Your note"
-     feedback form UI in the comp is NOT yet ported/added to the live app — build it when the design is
-     ported. Also optional: public "most requested" surfaced as an aggregate (deferred — no individual
-     notes public).
+1. **Deploy this branch (the main task, blocked on a yes from the user):**
+   `git checkout main && git merge redesign/soft-cream` → set `MCP_ADMIN_KEY` on Vercel →
+   apply `supabase/migrations/0003_feedback.sql` to prod → `vercel --prod` → run `npm audit fix --force` first.
+2. **Custom domain** — point `rundocket.xyz` at Vercel (finishes the agent front door; `randoke.xyz/mcp`
+   is what llms.txt advertises).
+3. **Idea-lifecycle web UI** — OPEN (agent/MCP-only now). Decide if human claim/build buttons wanted.
+4. **GitHub auto-deploy** — Vercel identity lacks repo write access; needs Vercel GitHub App or creds.
+5. **Per-identity MCP keys** — future hardening for a public marketplace (shared key OK for pilot).
 
 ## Files that matter (quick index)
-- `docs/README.md` → orientation index
-- `docs/ARCHITECTURE.md` → how the code is organised (read before touching code)
-- `docs/DESIGN-VISION.md` → future design concept
-- `packages/core/src/brand.ts` → agent/server-facing name (single source)
-- `apps/web/lib/site.ts` → web-side name/domain (keep in sync with brand.ts)
-- `apps/web/lib/copy.ts` → all user-facing copy
-- `apps/web/app/globals.css` → all design tokens
-- `apps/web/app/api/listings/route.ts` → web publish endpoint (POST only)
-- `apps/web/app/page.tsx` → server-rendered board (reads from core Store directly)
-- `apps/web/app/llms.txt/route.ts` → open agent-readable index + install manifest
-- `packages/mcp/src/server.ts` → MCP tool definitions (7 tools)
-- `packages/mcp/src/index.ts` → standalone MCP server entrypoint
-- `supabase/migrations/*` → schema
-- `scripts/seed.mjs` → seeds 31 dev rows
-- `vercel.json` → Vercel deploy config (monorepo-aware)
-- `.env.example` → env var reference
-- Planning docs: `~/Hermes/apprank/apprank_idea/pm_wayfinder/{MVP,SPEC,MAP}.md`
+- `docs/RESUME.md` · `docs/ARCHITECTURE.md` · `docs/SECURITY.md` · `docs/DESIGN-VISION.md`
+- `packages/core/src/brand.ts`, `apps/web/lib/site.ts` → name/domain
+- `apps/web/lib/copy.ts` → ALL user-facing copy
+- `apps/web/app/globals.css` → design tokens
+- `apps/web/app/_components/{Landing,Catalog,PublishModal}.tsx` → front-end
+- `apps/web/app/api/{listings,feedback,mcp}/route.ts` → web endpoints
+- `packages/mcp/src/server.ts` → MCP tools (9: publish, search, get_listing, claim_idea, update_claim,
+  my_ideas, list_idea_activity, feedback, top_feedback)
+- `supabase/migrations/*` (0001, 0002, 0003) → schema
+- `scripts/seed.mjs` · `scripts/verify_feedback.mjs` · `.env.example` · `vercel.json`
+- `design-sketches/008-final-docket/index.html` → locked comp
+- Planning: `~/Hermes/apprank/apprank_idea/pm_wayfinder/{MVP,SPEC,MAP}.md`
 
 ## Do NOT
-- Re-explain the product to the user — it's in the planning docs + this handoff.
+- Re-explain the product (planning docs + this handoff have it).
 - Touch another profile's files.
-- Assume any open item is decided — ask the user.
+- Assume an open item is decided — ask the user.
+- Rename the DB/folder `apprank` (those are live infra connections, not brand).
