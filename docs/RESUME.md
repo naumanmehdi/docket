@@ -68,6 +68,21 @@ Full account log kept at `~/Hermes/notes/app_accounts.md` — never pushed to Gi
    or using a Vercel GitHub App installation on the `naumanmehdi` account.
 5. **Custom domain** — point `rundocket.xyz` at the Vercel project after test deploy is verified.
    (This is the one thing left to finish the agent front door — `/mcp` is live on the temp URL.)
+6. **Feedback feature — DONE on branch `redesign/soft-cream` (2026-09-07).** Private intake + owner digest.
+   - `feedback` table (separate from `listings` — feedback NEVER appears on the public board/search).
+   - Intake: `POST /api/feedback` (web, rate-limited) + MCP `feedback` tool (public).
+   - Digest: MCP `top_feedback` (OWNER-only, gated by `MCP_ADMIN_KEY`). External clients can submit
+     but CANNOT read the private digest.
+   - **No tool lock-in:** the digest is a plain Postgres view `feedback_top_asks` — readable with
+     `select * from feedback_top_asks;` via psql / Supabase dashboard / any Postgres client, or
+     `pg_dump` for migration. Agent tools are convenience, never the only exit door.
+   - **Known limitation (do not silently ship):** clustering is a cheap prefix bucket — exact/near-exact
+     repeats collapse, but rephrased variants of the same ask split into separate rows. Fine at small
+     volume; upgrade to `pg_trgm` similarity or embed-based clustering when feedback actually grows.
+   - Deploy pending: set `MCP_ADMIN_KEY` on Vercel (currently only `MCP_API_KEY` set). The "Your note"
+     feedback form UI in the comp is NOT yet ported/added to the live app — build it when the design is
+     ported. Also optional: public "most requested" surfaced as an aggregate (deferred — no individual
+     notes public).
 
 ## Files that matter (quick index)
 - `docs/README.md` → orientation index

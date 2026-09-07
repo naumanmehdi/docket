@@ -1,5 +1,5 @@
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
-import { createApprankServer, authorize } from "@apprank/mcp";
+import { createApprankServer, authorize, bearerToken } from "@apprank/mcp";
 import { getStore } from "@/lib/store";
 
 export const runtime = "nodejs";
@@ -8,18 +8,18 @@ export const dynamic = "force-dynamic";
 
 /**
  * /api/mcp — the docket MCP server hosted on the same Vercel deployment as the
- * web app (rewritten to /mcp by vercel.json). This is the agent-native front
- * door: an agent connects here over Streamable HTTP, using Bearer MCP_API_KEY,
- * and gets the same 7 tools the standalone server exposes.
+ * web app (rewritten to /mcp by vercel.json).
+ *
+ * TWO auth tiers:
+ *  - MCP_API_KEY   = public key. Can submit feedback, search, publish, claim.
+ *  - MCP_ADMIN_KEY = owner key. Adds the private owner tools (top_feedback).
+ * External clients connect with MCP_API_KEY when /mcp is shared in llms.txt;
+ * they cannot read the private feedback digest because the owner tools are
+ * only enabled when the request authenticated with the admin key.
  *
  * Vercel functions are stateless lambdas, so we use the MCP **stateless**
  * JSON-response mode: each HTTP request builds a fresh transport + fresh MCP
- * server, handles the request, and returns. The underlying `Protocol` refuses
- * to connect to more than one transport, so a per-request server is required —
- * and stateless mode is what the SDK explicitly prescribes for share-nothing
- * hosts (enableJsonResponse = single round-trips, no SSE session to keep).
- *
- * /mcp (rewritten here) is SHAREABLE via public config in client apps.
+ * server, handles the request, and returns.
  */
 
 function unauthorized(): Response {
@@ -27,23 +27,32 @@ function unauthorized(): Response {
 }
 
 async function handle(request: Request): Promise<Response> {
-  const apiKey = process.env.MCP_API_KEY;
-  if (!authorize(request.headers, apiKey)) {
+  const publicKey = process.env.MCP_API_KEY;
+  const adminKey = process.env.MCP_ADMIN_KEY;
+
+  // Resolve tier: admin key (if set) wins, then public key. Fail closed.
+  let feedbackAdminKey: string | undefined;
+  const token = bearerToken(request.headers);
+  if (adminKey && token && authorize(request.headers, adminKey)) {
+    feedbackAdminKey = adminKey; // enable owner-only tools for this request
+  } else if (publicKey && authorize(request.headers, publicKey)) {
+    // public tier — owner tools stay disabled
+  } else {
     return unauthorized();
   }
 
-  // Stateless per-request transport: no sessionIdGenerator, JSON responses on.
   const transport = new WebStandardStreamableHTTPServerTransport({
     enableJsonResponse: true,
-    // Stateless mode: omit sessionIdGenerator so each request is self-contained.
   });
-  const server = createApprankServer({ store: getStore() });
+  const server = createApprankServer({
+    store: getStore(),
+    feedbackAdminKey,
+  });
 
   try {
     await server.connect(transport);
     return await transport.handleRequest(request);
   } finally {
-    // Allow the per-request server+pool to be reclaimed; nothing persists.
     server.close().catch(() => {});
   }
 }

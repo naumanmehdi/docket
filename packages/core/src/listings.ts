@@ -48,6 +48,35 @@ export type ClaimResult =
   | { ok: true; listing: Listing; log: ClaimLog }
   | { ok: false; error: string };
 
+/* -------------------------------------------------------------------------
+   Feedback (private intake — SEPARATE from the public listings catalog).
+   No public board or search reads feedback. Owner-only via admin key or SQL.
+   ------------------------------------------------------------------------- */
+export type FeedbackKind = "general" | "idea" | "app" | "mcp" | "skill";
+export type FeedbackStatus = "new" | "acknowledged" | "triage" | "shipped" | "wontdo" | "spam";
+
+export interface Feedback {
+  id: string;
+  message: string;
+  kind: FeedbackKind;
+  contact: string | null;
+  status: FeedbackStatus;
+  source: "web" | "mcp";
+  created_at: Date;
+}
+
+export interface TopAsk {
+  kind: FeedbackKind;
+  bucket: string;
+  votes: number;
+  last_at: Date;
+  sample: string;
+}
+
+export const FEEDBACK_KINDS: FeedbackKind[] = ["general", "idea", "app", "mcp", "skill"];
+export const FEEDBACK_KIND_DEFAULT: FeedbackKind = "general";
+export const FEEDBACK_MESSAGE_MAX = 4000;
+
 export interface Store {
   insertListing(input: ListingInput): Promise<Listing>;
   getListing(id: string): Promise<Listing | null>;
@@ -62,6 +91,14 @@ export interface Store {
   ): Promise<ClaimResult>;
   listIdeaActivity(ideaId: string): Promise<ClaimLog[]>;
   listMyIdeas(actor: string): Promise<Listing[]>;
+  /* feedback — private intake + owner digest */
+  submitFeedback(input: {
+    message: string;
+    kind?: FeedbackKind;
+    contact?: string;
+    source?: "web" | "mcp";
+  }): Promise<Feedback>;
+  topFeedback(opts?: { limit?: number }): Promise<TopAsk[]>;
 }
 
 const ROW_SELECT = `select id, kind, name, tagline, description, url, repo_url, category,
@@ -104,6 +141,30 @@ function mapClaimLog(row: Record<string, unknown> | undefined): ClaimLog {
     action: row.action as ClaimLog["action"],
     detail: (row.detail as string | null) ?? null,
     created_at: row.created_at as Date,
+  };
+}
+
+function mapFeedback(row: Record<string, unknown> | undefined): Feedback {
+  if (!row) throw new Error("expected a feedback row");
+  return {
+    id: row.id as string,
+    message: row.message as string,
+    kind: row.kind as FeedbackKind,
+    contact: (row.contact as string | null) ?? null,
+    status: row.status as FeedbackStatus,
+    source: row.source as "web" | "mcp",
+    created_at: row.created_at as Date,
+  };
+}
+
+function mapTopAsk(row: Record<string, unknown> | undefined): TopAsk {
+  if (!row) throw new Error("expected a top-ask row");
+  return {
+    kind: row.kind as FeedbackKind,
+    bucket: row.bucket as string,
+    votes: (row.votes as number) ?? 0,
+    last_at: row.last_at as Date,
+    sample: row.sample as string,
   };
 }
 
@@ -303,6 +364,30 @@ export function createStore(pool: pg.Pool): Store {
     return rows.map(mapListing);
   };
 
+  const submitFeedback = async (input: {
+    message: string;
+    kind?: FeedbackKind;
+    contact?: string;
+    source?: "web" | "mcp";
+  }): Promise<Feedback> => {
+    const kind = input.kind && FEEDBACK_KINDS.includes(input.kind) ? input.kind : FEEDBACK_KIND_DEFAULT;
+    const source = input.source === "mcp" ? "mcp" : "web";
+    const { rows } = await pool.query(
+      `insert into feedback (message, kind, contact, source) values ($1,$2,$3,$4) returning *`,
+      [input.message, kind, input.contact?.trim() ? input.contact.trim() : null, source]
+    );
+    return mapFeedback(rows[0]);
+  };
+
+  const topFeedback = async (opts?: { limit?: number }): Promise<TopAsk[]> => {
+    const limit = clampLimit(opts?.limit, 12);
+    const { rows } = await pool.query(
+      `select kind, bucket, votes, last_at, sample from feedback_top_asks limit $1`,
+      [limit]
+    );
+    return rows.map(mapTopAsk);
+  };
+
   return {
     insertListing,
     getListing,
@@ -313,5 +398,7 @@ export function createStore(pool: pg.Pool): Store {
     updateClaim,
     listIdeaActivity,
     listMyIdeas,
+    submitFeedback,
+    topFeedback,
   };
 }

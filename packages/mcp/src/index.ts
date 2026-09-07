@@ -15,6 +15,7 @@ export type { ApprankServerDeps } from "./server.js";
 export interface StartServerOptions {
   databaseUrl: string;
   mcpApiKey: string;
+  mcpAdminKey?: string;
   port?: number;
 }
 
@@ -30,7 +31,10 @@ export interface RunningServer {
 export async function startServer(options: StartServerOptions): Promise<RunningServer> {
   const pool = createPool(options.databaseUrl);
   const store = createStore(pool);
-  const server = createApprankServer({ store });
+  const server = createApprankServer({
+    store,
+    feedbackAdminKey: options.mcpAdminKey,
+  });
 
   const transport = new WebStandardStreamableHTTPServerTransport({
     sessionIdGenerator: () => crypto.randomUUID(),
@@ -94,7 +98,7 @@ if (isMain) {
     process.exit(1);
   }
   const port = Number(process.env.PORT ?? "3001");
-  startServer({ databaseUrl, mcpApiKey, port }).then((s) => {
+  startServer({ databaseUrl, mcpApiKey, mcpAdminKey: process.env.MCP_ADMIN_KEY, port }).then((s) => {
     console.log(`docket MCP server listening on ${s.url}`);
   });
 }

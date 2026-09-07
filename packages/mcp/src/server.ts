@@ -12,6 +12,11 @@ export interface ApprankServerDeps {
   store: Store;
   name?: string;
   version?: string;
+  /** Secret that unlocks private owner tools (currently top_feedback). When
+   * unset (or a request's key differs), those tools are refused — so linked
+   * third-party clients on the shared public key can submit feedback but can
+   * NOT read the private digest. */
+  feedbackAdminKey?: string;
 }
 
 const publishInput = z.object({
@@ -69,6 +74,21 @@ const updateClaimInput = z.object({
   progress_note: z.string().max(500).optional().describe("Optional status note / repo link."),
 });
 type UpdateClaimArgs = z.infer<typeof updateClaimInput>;
+
+const feedbackInput = z.object({
+  message: z.string().min(1).max(4000).describe("Your feedback — what docket should do better, add, or change."),
+  kind: z
+    .enum(["general", "idea", "app", "mcp", "skill"])
+    .optional()
+    .describe("Optional tag for what the feedback is about."),
+  contact: z.string().max(200).optional().describe("Optional handle/email so the owner can follow up."),
+});
+type FeedbackArgs = z.infer<typeof feedbackInput>;
+
+const topFeedbackInput = z.object({
+  limit: z.number().int().min(1).max(50).optional().describe("Number of top asks to return."),
+});
+type TopFeedbackArgs = z.infer<typeof topFeedbackInput>;
 
 function text(payload: unknown): { content: { type: "text"; text: string }[] } {
   return { content: [{ type: "text", text: JSON.stringify(payload) }] };
@@ -233,6 +253,49 @@ export function createApprankServer(deps: ApprankServerDeps): McpServer {
       const args = raw as ByIdArgs;
       const log = await deps.store.listIdeaActivity(args.id);
       return text(log.map((l) => ({ action: l.action, actor: l.actor, detail: l.detail, at: l.created_at.toISOString() })));
+    }) as any
+  );
+
+  server.registerTool(
+    "feedback",
+    {
+      title: "Send feedback",
+      description:
+        `Send the owner of ${BRAND.name} a note — a gap, a request, a complaint, a new-kind idea. ` +
+        `Use whenever the user says "feedback", "I wish docket could", "it would help if", ` +
+        `"are you working on X". This is PRIVATE: it goes to the owner's intake, never the ` +
+        `public board, and never affects search results or the catalog.`,
+      inputSchema: feedbackInput,
+    } as any,
+(async (raw: unknown) => {
+      const args = raw as FeedbackArgs;
+      const f = await deps.store.submitFeedback({
+        message: args.message,
+        kind: args.kind,
+        contact: args.contact,
+        source: "mcp",
+      });
+      return text({ ok: true, id: f.id, kind: f.kind, status: f.status, at: f.created_at.toISOString() });
+    }) as any
+  );
+
+  server.registerTool(
+    "top_feedback",
+    {
+      title: "Top requested changes (owner-only)",
+      description:
+        `The clustered, de-duplicated digest of user feedback — "top asks with vote counts" — so ` +
+        `an owner sees what to build next without reading every raw note. OWNER-ONLY: requires ` +
+        `an admin bearer key. External clients can submit feedback but cannot read this.`,
+      inputSchema: topFeedbackInput,
+    } as any,
+(async (raw: unknown) => {
+      if (!deps.feedbackAdminKey) {
+        return error("top_feedback requires the owner's admin key");
+      }
+      const args = raw as TopFeedbackArgs;
+      const asks = await deps.store.topFeedback({ limit: args.limit });
+      return text(asks.map((a) => ({ kind: a.kind, votes: a.votes, last_at: a.last_at.toISOString(), sample: a.sample })));
     }) as any
   );
 

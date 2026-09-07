@@ -21,4 +21,13 @@ export type {
   ClaimLog,
   ClaimResult,
   SearchOptions,
+  FeedbackKind,
+  FeedbackStatus,
+  Feedback,
+  TopAsk,
+} from "./listings.js";
+export {
+  FEEDBACK_KINDS,
+  FEEDBACK_KIND_DEFAULT,
+  FEEDBACK_MESSAGE_MAX,
 } from "./listings.js";
