@@ -26,8 +26,10 @@
 | `RESUME.md` | **Live handoff** — current state, open items, how to run |
 | `ARCHITECTURE.md` | Engineering orientation — layers, client/server rule, single-source copy/brand/taxonomy, data model, flows, run steps |
 | `DESIGN-VISION.md` | The future high-end playful/motion design concept (not built) |
+| `WORKSTREAMS.md` | Dedicated brief for branding, content, and case-study work |
 | *(repo)* `README.md` | Repo quickstart (now points here) |
 | *(repo)* `SECURITY.md` | Security posture |
+| *(repo)* `CASE-STUDY.md` | Showable product story for Show-HN / portfolio |
 
 ## The key rule that makes this future-proof
 **Front-end redesigns never touch the backend.** Data + logic live in `packages/core` + the server page;
