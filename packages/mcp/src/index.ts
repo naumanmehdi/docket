@@ -4,6 +4,14 @@ import { createStore, createPool } from "@apprank/core";
 import { createApprankServer } from "./server.js";
 import { authorize } from "./auth.js";
 
+// Re-export the edge auth helper so a host (Vercel /api/mcp route) can enforce
+// the same MCP_API_KEY bearer check before dispatching to the transport.
+export { authorize, bearerToken, safeEqual } from "./auth.js";
+// Re-export the server factory so a host can build a per-request MCP server
+// (stateless) around its own transport — the standalone entrypoint stays local.
+export { createApprankServer } from "./server.js";
+export type { ApprankServerDeps } from "./server.js";
+
 export interface StartServerOptions {
   databaseUrl: string;
   mcpApiKey: string;
