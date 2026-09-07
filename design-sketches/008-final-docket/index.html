@@ -219,6 +219,8 @@
   .f-col a { color: var(--mut); text-decoration: none; font-size: 13.5px; transition: color .35s var(--ease); width: max-content; }
   .f-col a:hover { color: var(--ember); }
   .f-legal { text-align: center; color: var(--faint); font-size: 12px; padding-top: 18px; border-top: 1px solid var(--hair); }
+  .f-legal a.f-credit { color: var(--mut); text-decoration: none; font-weight: 500; transition: color .35s var(--ease); }
+  .f-legal a.f-credit:hover { color: var(--ember); }
 
   /* ================= FEEDBACK — paper "note" in the docket ================= */
   .feedback { margin-top: 92px; }
@@ -400,8 +402,8 @@
     <div class="feed-note reveal">
       <span class="feed-tab">Your note</span>
       <div class="feed-body">
-        <div class="sec-head"><h2>Shape the next docket.</h2><span class="hint mono">feedback → index → next build</span></div>
-        <p class="feed-lede">Spot a gap, want a new kind, or think something should work differently? Drop a note — it lands <b>straight in the docket's index</b>, read and triaged like every other listing.</p>
+        <div class="sec-head"><h2>Shape the next docket.</h2><span class="hint mono">private note → your desk → next build</span></div>
+        <p class="feed-lede">Spot a gap, want a new kind, or think something should work differently? Drop a note — it goes <b>straight to the maker's desk</b>, not the public board. Read privately, top asks decide what ships next.</p>
         <div class="feed-form">
           <textarea class="minput" rows="3" placeholder="What should docket do better? e.g. “I want a devtools category”…"></textarea>
           <div class="feed-row">
@@ -410,7 +412,7 @@
             <button class="pbtn feed-send" onclick="sendFeedback(this)">Send to the docket →</button>
           </div>
         </div>
-        <div class="feed-msg" id="feedMsg">noted ✓ — it's in the index and on the build list.</div>
+        <div class="feed-msg" id="feedMsg">noted ✓ — it's on the maker's desk and up for the next build.</div>
         <p class="feed-note2 mono">your agent can do it too · a feedback verb is coming to /mcp</p>
       </div>
     </div>
@@ -440,7 +442,7 @@
         <a href="#">Terms</a>
       </div>
     </div>
-    <p class="f-legal">© 2026 docket — built for builders &amp; their agents</p>
+    <p class="f-legal">© 2026 docket — built for builders &amp; their agents · Made with ❤️ by <a class="f-credit" href="https://x.com/NaumanMehdi" target="_blank" rel="noopener noreferrer">@naumanmehdi</a></p>
   </footer>
 </div>
 
