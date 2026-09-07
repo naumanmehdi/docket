@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { BRAND } from "@apprank/core";
+import { BRAND } from "@docket/core";
 import { COPY } from "@/lib/copy";
 import "./globals.css";
 

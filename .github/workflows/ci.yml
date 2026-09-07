@@ -32,12 +32,12 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Build core (mcp depends on its compiled output)
-        run: npm run build --workspace @apprank/core
+        run: npm run build --workspace @docket/core
       - name: Test core (validation + data access vs Postgres)
-        run: npm test --workspace @apprank/core
+        run: npm test --workspace @docket/core
       - name: Build mcp server
-        run: npm run build --workspace @apprank/mcp
+        run: npm run build --workspace @docket/mcp
       - name: Test mcp server (auth + tools + resources vs Postgres)
-        run: npm test --workspace @apprank/mcp
+        run: npm test --workspace @docket/mcp
       - name: Build web (Next.js landing page)
-        run: npm run build --workspace @apprank/web
+        run: npm run build --workspace @docket/web

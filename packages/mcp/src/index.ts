@@ -1,7 +1,7 @@
 import http from "node:http";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
-import { createStore, createPool } from "@apprank/core";
-import { createApprankServer } from "./server.js";
+import { createStore, createPool } from "@docket/core";
+import { createDocketServer } from "./server.js";
 import { authorize } from "./auth.js";
 
 // Re-export the edge auth helper so a host (Vercel /api/mcp route) can enforce
@@ -9,8 +9,8 @@ import { authorize } from "./auth.js";
 export { authorize, bearerToken, safeEqual } from "./auth.js";
 // Re-export the server factory so a host can build a per-request MCP server
 // (stateless) around its own transport — the standalone entrypoint stays local.
-export { createApprankServer } from "./server.js";
-export type { ApprankServerDeps } from "./server.js";
+export { createDocketServer } from "./server.js";
+export type { DocketServerDeps } from "./server.js";
 
 export interface StartServerOptions {
   databaseUrl: string;
@@ -31,7 +31,7 @@ export interface RunningServer {
 export async function startServer(options: StartServerOptions): Promise<RunningServer> {
   const pool = createPool(options.databaseUrl);
   const store = createStore(pool);
-  const server = createApprankServer({
+  const server = createDocketServer({
     store,
     feedbackAdminKey: options.mcpAdminKey,
   });

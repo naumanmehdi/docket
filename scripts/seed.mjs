@@ -1,7 +1,7 @@
 // Seed the dev board across all four kinds so the whole app is testable:
 // pagination (load-more needs >8 per view), category filters, sub-filters, search.
 // Usage: DATABASE_URL=postgres://localhost:5432/apprank node scripts/seed.mjs
-import { createPool, createStore } from "@apprank/core";
+import { createPool, createStore } from "@docket/core";
 
 // Categories match apps/web/lib/taxonomy.ts (the real shared source).
 const APPS = [

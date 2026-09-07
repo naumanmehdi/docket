@@ -2,7 +2,7 @@
   "framework": "nextjs",
   "outputDirectory": "apps/web/.next",
   "installCommand": "npm install",
-  "buildCommand": "npm run build --workspace @apprank/web",
+  "buildCommand": "npm run build --workspace @docket/web",
   "rewrites": [
     { "source": "/mcp", "destination": "/api/mcp" }
   ]

@@ -29,7 +29,7 @@ Read this + `ARCHITECTURE.md` first, then `git status`. Don't re-derive anything
 - `apps/web/app/api/mcp/route.ts` hosts the same 7-tool MCP server on the Vercel deployment
   (`/mcp` rewrites here via vercel.json). **Stateless** JSON-response mode: a fresh transport +
   server per request (required on serverless — `Protocol` can't reuse a transport). Auth = `MCP_API_KEY`
-  bearer, enforced at the edge (401 otherwise). `@apprank/mcp` + SDK added to web deps.
+  bearer, enforced at the edge (401 otherwise). `@docket/mcp` + SDK added to web deps.
 - Verified live: real client handshake on the prod URL — listTools (7), publish, claim, get_listing
   all work against the Supabase DB. Env: `MCP_API_KEY` set on Vercel (all 3 envs), also in `.env.local`.
 - Connect URL for agents: `https://rundocket.xyz/mcp` (or the temp `.vercel.app` while unpointed);

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { RateLimiter, FEEDBACK_MESSAGE_MAX, type FeedbackKind } from "@apprank/core";
+import { RateLimiter, FEEDBACK_MESSAGE_MAX, type FeedbackKind } from "@docket/core";
 import { getStore } from "@/lib/store";
 
 export const runtime = "nodejs";

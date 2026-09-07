@@ -2,8 +2,8 @@ import { beforeAll, afterAll, beforeEach, describe, it, expect } from "vitest";
 import pg from "pg";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
-import { createStore } from "@apprank/core";
-import { createApprankServer } from "../src/server.js";
+import { createStore } from "@docket/core";
+import { createDocketServer } from "../src/server.js";
 
 const { Pool } = pg;
 const TEST_URL =
@@ -59,7 +59,7 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await pool.query("truncate listings, claim_log");
-  const server = createApprankServer({ store });
+  const server = createDocketServer({ store });
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
   client = new Client({ name: "test-client", version: "0.0.0" });
   await Promise.all([client.connect(clientTransport), server.connect(serverTransport)]);

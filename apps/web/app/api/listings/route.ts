@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { validateListing, RateLimiter } from "@apprank/core";
+import { validateListing, RateLimiter } from "@docket/core";
 import { getStore } from "@/lib/store";
 
 export const runtime = "nodejs";

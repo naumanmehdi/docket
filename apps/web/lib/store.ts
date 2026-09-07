@@ -1,5 +1,5 @@
 import "server-only";
-import { createPool, createStore, type Store } from "@apprank/core";
+import { createPool, createStore, type Store } from "@docket/core";
 
 // Server-only, lazy singleton store backed by DATABASE_URL (Supabase in prod,
 // local Postgres in dev). The exact same store the MCP server writes to.

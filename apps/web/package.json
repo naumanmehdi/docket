@@ -1,5 +1,5 @@
 {
-  "name": "@apprank/web",
+  "name": "@docket/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,8 +9,8 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@apprank/core": "*",
-    "@apprank/mcp": "*",
+    "@docket/core": "*",
+    "@docket/mcp": "*",
     "@modelcontextprotocol/sdk": "^1.8.0",
     "next": "^15.1.3",
     "react": "^19.0.0",

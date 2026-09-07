@@ -1,4 +1,4 @@
-import type { Kind } from "@apprank/core";
+import type { Kind } from "@docket/core";
 
 // ---------------------------------------------------------------------------
 // TAXONOMY — single source of truth for listing categories per kind.

@@ -1,4 +1,4 @@
-import { BRAND, KINDS, type Listing } from "@apprank/core";
+import { BRAND, KINDS, type Listing } from "@docket/core";
 import { getStore } from "@/lib/store";
 
 export const runtime = "nodejs";

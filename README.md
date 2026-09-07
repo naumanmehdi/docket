@@ -39,14 +39,14 @@ psql -d apprank_test -f supabase/migrations/0001_create_listings.sql -f supabase
 # seed the dev board
 DATABASE_URL=postgres://localhost:5432/apprank node scripts/seed.mjs
 # web app :3000
-DATABASE_URL=postgres://localhost:5432/apprank npm run dev --workspace @apprank/web
+DATABASE_URL=postgres://localhost:5432/apprank npm run dev --workspace @docket/web
 # tests (core + mcp) against the test DB
 DATABASE_URL_TEST=postgres://localhost:5432/apprank_test npm test
 ```
 
 MCP server (separate, :3001):
 ```bash
-DATABASE_URL=postgres://localhost:5432/apprank MCP_API_KEY=dev-key npm run start --workspace @apprank/mcp
+DATABASE_URL=postgres://localhost:5432/apprank MCP_API_KEY=dev-key npm run start --workspace @docket/mcp
 ```
 
 ## Security

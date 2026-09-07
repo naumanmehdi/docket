@@ -44,7 +44,7 @@ app/                      <- this repo (git), lives at ~/Hermes/apprank/app
 A design overhaul = swap components + tokens + copy. Data, DB, MCP, and the server page stay put.
 
 ## 3. Client vs server — the critical rule
-- **`@apprank/core` bundles `pg` (server-only `fs`).** Client components must **never import it**.
+- **`@docket/core` bundles `pg` (server-only `fs`).** Client components must **never import it**.
 - Client components import **web libs only**: `site.ts`, `copy.ts`, `taxonomy.ts`, `listing.ts`.
 - The server `page.tsx` imports `core` + fetches rows, serialises them to plain `ListingRow`
   (`lib/listing.ts`), and passes them **as props** to the client `Landing`. Client never talks to the DB.
@@ -95,9 +95,9 @@ psql -d apprank_test -f supabase/migrations/0001_create_listings.sql -f supabase
 npm install
 DATABASE_URL=postgres://localhost:5432/apprank node scripts/seed.mjs
 # MCP server :3001
-DATABASE_URL=postgres://localhost:5432/apprank MCP_API_KEY=dev-key npm run start --workspace @apprank/mcp
+DATABASE_URL=postgres://localhost:5432/apprank MCP_API_KEY=dev-key npm run start --workspace @docket/mcp
 # Web :3000
-DATABASE_URL=postgres://localhost:5432/apprank npm run dev --workspace @apprank/web
+DATABASE_URL=postgres://localhost:5432/apprank npm run dev --workspace @docket/web
 # Tests (core + mcp) against test DB
 DATABASE_URL_TEST=postgres://localhost:5432/apprank_test npm test
 ```

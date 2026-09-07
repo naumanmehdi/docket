@@ -6,9 +6,9 @@ import {
   validateListing,
   type Store,
   type Validation,
-} from "@apprank/core";
+} from "@docket/core";
 
-export interface ApprankServerDeps {
+export interface DocketServerDeps {
   store: Store;
   name?: string;
   version?: string;
@@ -109,7 +109,7 @@ function error(message: string): { content: { type: "text"; text: string }[]; is
  *  - list_idea_activity: the public claim/build timeline
  * Pure of any transport — usable over InMemoryTransport (tests), streamable HTTP, or stdio.
  */
-export function createApprankServer(deps: ApprankServerDeps): McpServer {
+export function createDocketServer(deps: DocketServerDeps): McpServer {
   const server = new McpServer(
     { name: deps.name ?? BRAND.name, version: deps.version ?? "0.1.0" },
     { capabilities: { tools: {} } }

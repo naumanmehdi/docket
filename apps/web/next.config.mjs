@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ["@apprank/core"],
+  transpilePackages: ["@docket/core"],
 };
 
 export default nextConfig;

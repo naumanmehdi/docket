@@ -1,5 +1,5 @@
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
-import { createApprankServer, authorize, bearerToken } from "@apprank/mcp";
+import { createDocketServer, authorize, bearerToken } from "@docket/mcp";
 import { getStore } from "@/lib/store";
 
 export const runtime = "nodejs";
@@ -44,7 +44,7 @@ async function handle(request: Request): Promise<Response> {
   const transport = new WebStandardStreamableHTTPServerTransport({
     enableJsonResponse: true,
   });
-  const server = createApprankServer({
+  const server = createDocketServer({
     store: getStore(),
     feedbackAdminKey,
   });

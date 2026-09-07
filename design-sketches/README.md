@@ -32,7 +32,7 @@ sides of the marketplace; board preview framed as "ideas waiting to be built" wi
 **Stance:** AppRank is an **MCP server / agent tool**, and the whole page proves it by showing the terminal doing the work.
 
 **Hero:** *"Your agent can publish and find anything it builds with."* — the terminal mockup literally runs
-`install apprank-mcp` → `publish my idea…` → `find me something to build` and shows each succeed.
+`install docket-mcp` → `publish my idea…` → `find me something to build` and shows each succeed.
 
 **Choices:** dark dev-tool aesthetic (Space Grotesk + JetBrains Mono), registry/terminal chrome, the board
 rendered as a mono index with kind tags (IDEA/APP/MCP/SKILL). Reads instantly as "for developers and agents."

@@ -1,4 +1,4 @@
-import type { Listing } from "@apprank/core";
+import type { Listing } from "@docket/core";
 
 // ---------------------------------------------------------------------------
 // LISTING ROW — serializable shape passed from the server page to client
