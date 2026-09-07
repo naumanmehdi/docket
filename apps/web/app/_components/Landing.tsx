@@ -45,6 +45,10 @@ export default function Landing({ rows }: { rows: ListingRow[] }) {
           <div className="installrow">
             <span className="i-label">{COPY.hero.connectLabel}:</span>
             <InstallCmd cmd={COPY.hero.installCmd(mcpUrl)} />
+            <details className="install-json">
+              <summary>JSON</summary>
+              <InstallCmd cmd={COPY.hero.installJson(mcpUrl)} />
+            </details>
           </div>
         </div>
 

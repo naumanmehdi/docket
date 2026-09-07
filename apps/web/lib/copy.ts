@@ -20,11 +20,13 @@ export const COPY = {
     ctaSecondary: "Browse the board →",
     connectLabel: "Connect",
     installCmd: (url: string) => `install docket from ${url}`,
+    installJson: (url: string) =>
+      `{\n  "mcpServers": {\n    "docket": {\n      "url": "${url}",\n      "headers": {\n        "Authorization": "Bearer YOUR_MCP_API_KEY"\n      }\n    }\n  }\n}`,
   },
   search: { placeholder: "search ideas, apps, MCPs & skills…", go: "Search" },
   terminal: {
     title: "you → your agent → docket",
-    install: "install docket from https://rundocket.xyz/mcp",
+    install: `{\n  "mcpServers": {\n    "docket": {\n      "url": "https://rundocket.xyz/mcp",\n      "headers": {\n        "Authorization": "Bearer YOUR_MCP_API_KEY"\n      }\n    }\n  }\n}`,
     publish: "publish my idea about an offline habit tracker",
     publishOut: "shift-copilot live → open to build",
     find: "find me a Supabase MCP",
