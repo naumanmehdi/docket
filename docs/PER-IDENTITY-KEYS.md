@@ -280,7 +280,7 @@ All admin endpoints check for your master key (`MCP_API_KEY` or `MCP_ADMIN_KEY`)
 > Read this whole appendix before merging or writing more front-end, so neither half is lost.
 
 ### ⏱ Status log
-- **Sep 08 — backend COMMITTED** to `feature/per-identity-keys` as **`738f52b`** (`feat(access): invite-code-gated per-identity MCP keys + admin backend`). Scope: the 18 backend/admin files below. This doc + appendix are now **tracked** (committed in `738f52b`).
+- **Sep 08 — backend COMMITTED** to `feature/per-identity-keys` as **`729d973`** (`feat(access): invite-code-gated per-identity MCP keys + admin backend`). Scope: the 18 backend/admin files below. This doc + appendix are now **tracked** (committed in `729d973`).
 - aipm session committed `7fcb0cb` (`docs: update RESUME.md`) earlier on the same branch.
 
 ### Reconcile note (added after reviewing aipm's RESUME.md, commit `7fcb0cb`)
@@ -291,12 +291,12 @@ All admin endpoints check for your master key (`MCP_API_KEY` or `MCP_ADMIN_KEY`)
 On branch `feature/per-identity-keys`:
 ```bash
 # 1) Confirm the commit landed + contains the backend:
-git log --oneline -2          # expect 738f52b + 7fcb0cb at tip
-git show --stat 738f52b        # 18 files: migration 0004, access.ts, auth/server scoping, admin routes + page
+git log --oneline -2          # expect 729d973 + 7fcb0cb at tip
+git show --stat 729d973        # 18 files: migration 0004, access.ts, auth/server scoping, admin routes + page
 
 # 2) Confirm the code is present on the branch:
-git show 738f52b:supabase/migrations/0004_invite_codes_and_keys.sql | head -5
-git ls-tree 738f52b --name-only apps/web/app/api/admin apps/web/app/admin
+git show 729d973:supabase/migrations/0004_invite_codes_and_keys.sql | head -5
+git ls-tree 729d973 --name-only apps/web/app/api/admin apps/web/app/admin
 
 # 3) Tests green:
 DATABASE_URL_TEST=postgres://localhost:5432/apprank_test npm test   # core 61, mcp 35
@@ -305,7 +305,7 @@ npm run build --workspace @docket/web
 ```
 Migration `0004` is already applied to local `apprank` + `apprank_test`.
 
-### Backend — DONE + COMMITTED (mine, non-overlapping, in `738f52b`)
+### Backend — DONE + COMMITTED (mine, non-overlapping, in `729d973`)
 All implemented on `feature/per-identity-keys` and verified locally against Postgres.
 
 | Area | File(s) | Notes |
@@ -333,9 +333,9 @@ All implemented on `feature/per-identity-keys` and verified locally against Post
 **E2E verified live** (dev server on local Postgres): 401 w/o admin key → mint code → list → register (bad code 400 / good code 201 returns `dk_…`) → duplicate-owner 400 → revoke flips key to revoked → `/api/mcp` accepts issued key, rejects bad token. Test rows cleaned up.
 
 ### Front-end — SPLIT, being reconciled by user in another session (aipm)
-- **`apps/web/app/admin/page.tsx` (MINE, non-overlapping):** full owner back-office — gate screen (admin key → sessionStorage, not cookie), stats cards, invite-codes table w/ status tags + revoke, issued-keys table w/ revoke, bulk-generate modal (count/max-uses/expiry) with copy-all. Reuses global design tokens. **COMMITTED in `738f52b`.**
+- **`apps/web/app/admin/page.tsx` (MINE, non-overlapping):** full owner back-office — gate screen (admin key → sessionStorage, not cookie), stats cards, invite-codes table w/ status tags + revoke, issued-keys table w/ revoke, bulk-generate modal (count/max-uses/expiry) with copy-all. Reuses global design tokens. **COMMITTED in `729d973`.**
 - **`apps/web/app/register/page.tsx` (MINE, OVERLAPS the aipm front-end):** self-serve redeem → show key once. **HELD — NOT committed; still untracked in the working tree. User reconciling with other session.**
-- **`apps/web/app/api/mcp-keys/register/route.ts` (MINE):** NOT included in `738f52b` (it's part of the register flow being reconciled). Still **untracked**. Backend register logic is written + E2E-tested locally but not yet committed.
+- **`apps/web/app/api/mcp-keys/register/route.ts` (MINE):** NOT included in `729d973` (it's part of the register flow being reconciled). Still **untracked**. Backend register logic is written + E2E-tested locally but not yet committed.
 - **`apps/web/app/_components/Landing.tsx` + `apps/web/lib/copy.ts` (aipm session):** added homepage nav link (label now reads "MCP") → `/connect` + a `connect` copy key. **Not mine — leave alone.** (aipm also has edits to `globals.css`, `next-env.d.ts` uncommitted.)
 - **`design-sketches/mcp-setup.html`, `design-sketches/register.html` (aipm session):** mockups. `register.html` matches `admin.html` styling. **Not mine — leave alone.**
 
