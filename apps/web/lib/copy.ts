@@ -7,7 +7,7 @@ import { SITE } from "./site";
 // components/CSS, never copy or data. (docs/ARCHITECTURE.md explains.)
 // ---------------------------------------------------------------------------
 export const COPY = {
-  nav: { explore: "Explore", board: "The board", publish: "Publish" },
+  nav: { explore: "Explore", board: "The board", connect: "MCP", publish: "Publish" },
   hero: {
     kicker: "free · open · agent-ready",
     titleLead: "Ideas that get built.",

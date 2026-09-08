@@ -280,12 +280,12 @@ All admin endpoints check for your master key (`MCP_API_KEY` or `MCP_ADMIN_KEY`)
 > Read this whole appendix before merging or writing more front-end, so neither half is lost.
 
 ### ⏱ Status log
-- **Sep 08 — backend COMMITTED** to `feature/per-identity-keys` as **`729d973`** (`feat(access): invite-code-gated per-identity MCP keys + admin backend`). Scope: the 18 backend/admin files below. This doc + appendix are now **tracked** (committed in `729d973`).
-- aipm session committed `7fcb0cb` (`docs: update RESUME.md`) earlier on the same branch.
+- Backend COMMITTED to `feature/per-identity-keys` as **`729d973`** (`feat(access): invite-code-gated per-identity MCP keys + admin backend`). Scope: the 18 backend/admin files below. This doc + appendix are now **tracked**.
+- Another session committed `7fcb0cb` (`docs: update RESUME.md`) earlier on the same branch.
 
-### Reconcile note (added after reviewing aipm's RESUME.md, commit `7fcb0cb`)
-- aipm's RESUME `7fcb0cb` (committed on `feature/per-identity-keys`) is the OTHER session's doc. Its **"Recent changes" block is accurate**; but its **"Next session: invite code system → What to build" section is STALE** — it still lists migration/core/auth/admin/register as unbuilt. **Do NOT rebuild those; they are DONE below.**
-- The nav in current code reads `Explore | The board | MCP | Publish` (`copy.ts`: `connect: "MCP"`) and links to **`/connect`, which has NO route yet** → resolve which register/connect page survives and point the link at it (see "What's left after merge").
+### Reconcile note
+- The earlier RESUME `7fcb0cb` is accurate in its “Recent changes” block, but its **“Next session: invite code system → What to build” section is stale** — migration/core/auth/admin/register are already built. Do not rebuild them.
+- The nav in current code reads `Explore | The board | MCP | Publish` (`copy.ts`: `connect: "MCP"`) and links to `/connect`, which has no route yet. Resolve which register/connect page survives and point the link at it.
 
 ### Verify the backend (for the other session) — HOW
 On branch `feature/per-identity-keys`:
@@ -332,23 +332,24 @@ All implemented on `feature/per-identity-keys` and verified locally against Post
 
 **E2E verified live** (dev server on local Postgres): 401 w/o admin key → mint code → list → register (bad code 400 / good code 201 returns `dk_…`) → duplicate-owner 400 → revoke flips key to revoked → `/api/mcp` accepts issued key, rejects bad token. Test rows cleaned up.
 
-### Front-end — SPLIT, being reconciled by user in another session (aipm)
-- **`apps/web/app/admin/page.tsx` (MINE, non-overlapping):** full owner back-office — gate screen (admin key → sessionStorage, not cookie), stats cards, invite-codes table w/ status tags + revoke, issued-keys table w/ revoke, bulk-generate modal (count/max-uses/expiry) with copy-all. Reuses global design tokens. **COMMITTED in `729d973`.**
-- **`apps/web/app/register/page.tsx` (MINE, OVERLAPS the aipm front-end):** self-serve redeem → show key once. **HELD — NOT committed; still untracked in the working tree. User reconciling with other session.**
-- **`apps/web/app/api/mcp-keys/register/route.ts` (MINE):** NOT included in `729d973` (it's part of the register flow being reconciled). Still **untracked**. Backend register logic is written + E2E-tested locally but not yet committed.
-- **`apps/web/app/_components/Landing.tsx` + `apps/web/lib/copy.ts` (aipm session):** added homepage nav link (label now reads "MCP") → `/connect` + a `connect` copy key. **Not mine — leave alone.** (aipm also has edits to `globals.css`, `next-env.d.ts` uncommitted.)
-- **`design-sketches/mcp-setup.html`, `design-sketches/register.html` (aipm session):** mockups. `register.html` matches `admin.html` styling. **Not mine — leave alone.**
+### Front-end — SPLIT, being reconciled
+- **`apps/web/app/admin/page.tsx` (COMMITTED):** full owner back-office — gate screen, stats cards, invite-codes table, issued-keys table, bulk-generate modal with copy-all. Reuses global design tokens. **COMMITTED in `729d973`.**
+- **`apps/web/app/register/page.tsx` (OVERLAPS):** self-serve redeem → show key once. **HELD — NOT committed; still untracked.**
+- **`apps/web/app/api/mcp-keys/register/route.ts` (OVERLAPS):** NOT included in `729d973`. Still **untracked**. Backend register logic is built + E2E-tested locally but not yet committed.
+- **`apps/web/app/_components/Landing.tsx` + `apps/web/lib/copy.ts`:** added homepage nav link (label now reads `MCP`) → `/connect` + a `connect` copy key. **Not committed yet.** Also has edits to `globals.css`, `next-env.d.ts` uncommitted.
+- **`design-sketches/mcp-setup.html`, `design-sketches/register.html`:** mockups. `register.html` matches `admin.html` styling.
 
-### ⚠️ Register contract mismatch — RESOLVE BEFORE MERGE
-The two sessions disagree on `/api/mcp-keys/register`. My backend ships the `PER-IDENTITY-KEYS.md`-plan shape; the aipm sketch uses a different shape. Pick ONE (recommended: backend, since it's built + tested):
+### Register contract mismatch — RESOLVE BEFORE MERGE
+The register endpoint and the register sketch disagree on shape. Pick ONE; recommended: keep the built backend contract and adapt the UI to it.
 
-| | My backend (built, untracked) | aipm sketch `register.html` |
+| | Backend contract (built, untracked) | Register sketch |
 |---|---|---|
 | POST body | `{ code, owner }` | `{ invite_code, owner }` |
 | Success | `{ ok, plaintext, scopes, owner, created_at, note }` | `{ key }` |
 | Error | `{ ok:false, errors:[...] }` + 4xx | `{ error }` |
 
-Options: (a) keep backend contract, adapt aipm UI to it; (b) make backend tolerant — accept `code` **or** `invite_code`, return key under **both** `plaintext` and `key`. If you choose (b), that edit is small and only in `apps/web/app/api/mcp-keys/register/route.ts`.
+Option A: keep backend contract, adapt UI.  
+Option B: make backend tolerant — accept `code` or `invite_code`, return key under `plaintext` and `key`. Small edit in `apps/web/app/api/mcp-keys/register/route.ts`.
 
 ### What's left after merge
 1. **Commit the register flow** — `apps/web/app/api/mcp-keys/register/route.ts` (+ resolve its contract first). Not yet in git.
