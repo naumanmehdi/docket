@@ -6,7 +6,8 @@ import { authorize } from "./auth.js";
 
 // Re-export the edge auth helper so a host (Vercel /api/mcp route) can enforce
 // the same MCP_API_KEY bearer check before dispatching to the transport.
-export { authorize, bearerToken, safeEqual } from "./auth.js";
+export { authorize, bearerToken, safeEqual, resolveAuth } from "./auth.js";
+export type { ResolveDeps, ResolveResult, AuthResolution, AuthOrigin } from "./auth.js";
 // Re-export the server factory so a host can build a per-request MCP server
 // (stateless) around its own transport — the standalone entrypoint stays local.
 export { createDocketServer } from "./server.js";

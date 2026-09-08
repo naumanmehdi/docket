@@ -195,6 +195,54 @@ describe("MCP idea lifecycle", () => {
   });
 });
 
+describe("MCP scope gating", () => {
+  async function connect(scopes?: import("@docket/core").KeyScope[]) {
+    const server = createDocketServer({ store, scopes });
+    const [cTransport, sTransport] = InMemoryTransport.createLinkedPair();
+    const c = new Client({ name: "test-client", version: "0.0.0" });
+    await Promise.all([c.connect(cTransport), server.connect(sTransport)]);
+    return c;
+  }
+
+  it("blocks a read-only key from publishing", async () => {
+    const c = await connect(["read"]);
+    const res = await c.callTool({ name: "publish", arguments: app });
+    expect(res.isError).toBe(true);
+    // lacks the "write" scope, so publish is refused with a scope error
+    expect(textOf(res)).toContain("write");
+    expect(textOf(res)).toContain("scope");
+    await c.close();
+  });
+
+  it("blocks a write-less key from search", async () => {
+    // A key with ONLY admin is not read; ensure write tools are the only gate
+    // by giving scopes that exclude read.
+    const c = await connect(["write"]);
+    const res = await c.callTool({ name: "search", arguments: { query: "anything" } });
+    expect(res.isError).toBe(true);
+    expect(textOf(res)).toContain("scope");
+    await c.close();
+  });
+
+  it("blocks a non-admin key from top_feedback", async () => {
+    const c = await connect(["read", "write"]);
+    const res = await c.callTool({ name: "top_feedback", arguments: {} });
+    expect(res.isError).toBe(true);
+    expect(textOf(res)).toContain("admin");
+    await c.close();
+  });
+
+  it("allows read+write key to publish and search", async () => {
+    const c = await connect(["read", "write"]);
+    const pub = await c.callTool({ name: "publish", arguments: app });
+    expect(pub.isError).not.toBe(true);
+    const s = await c.callTool({ name: "search", arguments: { query: "meetings" } });
+    expect(s.isError).not.toBe(true);
+    expect(JSON.parse(textOf(s)).length).toBeGreaterThan(0);
+    await c.close();
+  });
+});
+
 function textOf(result: { content?: Array<{ type: string; text?: string }> }): string {
   return result.content?.find((c) => c.type === "text")?.text ?? "";
 }

@@ -31,3 +31,21 @@ export {
   FEEDBACK_KIND_DEFAULT,
   FEEDBACK_MESSAGE_MAX,
 } from "./listings.js";
+export {
+  KEY_SCOPES,
+  REGISTER_SCOPES,
+  DEFAULT_KEY_RATE_PER_HOUR,
+  createAccessStore,
+  generateKeySecret,
+  hashKeySecret,
+  validOwner,
+} from "./access.js";
+export type {
+  AccessStore,
+  KeyScope,
+  InviteCode,
+  InviteCreateInput,
+  McpKey,
+  IssueResult,
+  RateDecision,
+} from "./access.js";
