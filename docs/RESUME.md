@@ -29,8 +29,34 @@ vercel --prod
 ## Open decisions (not bugs)
 1. Idea-lifecycle web UI — agent-only for now; decide if human claim/build buttons wanted
 2. GitHub auto-deploy — Vercel needs repo write access (GitHub App or creds)
-3. Per-identity MCP keys — shared key OK for pilot; per-user keys for public launch
+3. **Per-identity MCP keys + invite codes** — plan in `docs/PER-IDENTITY-KEYS.md`. Current: shared `MCP_API_KEY` only; no self-serve. Web form is open to all; MCP key needed only for `/mcp`.
 4. `rundocket.xyz` MX — no email set up yet
+
+## Next session: invite code system
+**Read first:** `docs/PER-IDENTITY-KEYS.md` — full plan with DB schema, endpoints, admin UI mockup, rate limiting, analytics.
+
+**What to build:**
+- Migration 0004: `invite_codes` + `mcp_keys` tables + `mcp_rate_limits` table
+- Core store methods for key lookup + invite code validation
+- Auth layer: DB key lookup + scope checks + master key fallback
+- Server tool gating via scopes
+- Registration endpoint: `POST /api/mcp-keys/register` (invite code + email → key)
+- Admin endpoints: `GET/POST /api/admin/invite-codes`, `GET /api/admin/mcp-keys`, `POST /api/admin/mcp-keys/revoke`
+- Optional admin page: `apps/web/app/admin/page.tsx` (simple HTML UI)
+- Tests for all new endpoints + auth
+
+**Delegation pattern:**
+- Agent 1 (backend): migrations + core + auth + server + backend tests
+- Agent 2 (web): registration + admin endpoints + frontend + web tests
+- Parent: integration + deploy to preview + merge to main
+
+**Design ref:** `design-sketches/admin.html` — admin UI mockup with stats, invite codes table, issued keys table, bulk code generation modal.
+
+**To start:**
+```bash
+cd ~/Hermes/apprank/app && nvm use 20
+git checkout -b feature/per-identity-keys
+```
 
 ## File map
 | File | What |
