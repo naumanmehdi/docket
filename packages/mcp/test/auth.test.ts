@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { authorize, bearerToken, getHeader, safeEqual } from "../src/auth.js";
+import { authorize, bearerToken, getHeader, safeEqual, resolveAuth, type ResolveDeps } from "../src/auth.js";
+import { hashKeySecret } from "@docket/core";
 
 describe("getHeader", () => {
   it("reads from a plain object (lowercased keys)", () => {
@@ -69,3 +70,64 @@ describe("authorize", () => {
     expect(authorize({ authorization: `Bearer ${KEY}` }, undefined)).toBe(false);
   });
 });
+
+describe("resolveAuth", () => {
+  const ADMIN = "admin-master-key";
+  const PUB = "public-master-key";
+  const ISSUED = "dk_issuedsecret1234567890abcdefghij";
+
+  // Fake access store keyed by sha256 hash — mirrors the real DB lookup.
+  // resolveAuth only touches findKeyByHash, so a partial object stands in.
+  const fakeAccess = {
+    findKeyByHash: async (hash: string) =>
+      hash === hashKeySecret(ISSUED)
+        ? { id: "key-1", owner: "a@b.com", scopes: ["read", "write"], revoked: false }
+        : null,
+  } as unknown as ResolveDeps["access"];
+
+  const deps: ResolveDeps = {
+    access: fakeAccess,
+    adminMasterKey: ADMIN,
+    publicMasterKey: PUB,
+  };
+
+  it("resolves the admin master key to full scopes", async () => {
+    const r = await resolveAuth({ authorization: `Bearer ${ADMIN}` }, deps);
+    expect(r.ok).toBe(true);
+    if (r.ok) {
+      expect(r.scopes).toEqual(["read", "write", "admin"]);
+      expect(r.keyId).toBeNull();
+      expect(r.origin).toBe("master-admin");
+    }
+  });
+
+  it("resolves the public master key to read+write", async () => {
+    const r = await resolveAuth({ authorization: `Bearer ${PUB}` }, deps);
+    expect(r.ok).toBe(true);
+    if (r.ok) {
+      expect(r.scopes).toEqual(["read", "write"]);
+      expect(r.origin).toBe("master-public");
+    }
+  });
+
+  it("resolves an issued key to its own scopes", async () => {
+    const r = await resolveAuth({ authorization: `Bearer ${ISSUED}` }, deps);
+    expect(r.ok).toBe(true);
+    if (r.ok) {
+      expect(r.scopes).toEqual(["read", "write"]);
+      expect(r.keyId).toBe("key-1");
+      expect(r.origin).toBe("key");
+    }
+  });
+
+  it("fail-closes on an unknown token", async () => {
+    const r = await resolveAuth({ authorization: "Bearer wrong-token" }, deps);
+    expect(r.ok).toBe(false);
+  });
+
+  it("fail-closes on a missing header", async () => {
+    const r = await resolveAuth({}, deps);
+    expect(r.ok).toBe(false);
+  });
+});
+

@@ -23,7 +23,8 @@ export default function Landing({ rows }: { rows: ListingRow[] }) {
           <nav>
             <a href="#explore">{COPY.nav.explore}</a>
             <a href="#board">{COPY.nav.board}</a>
-            <a className="pill" href="#" onClick={(e) => { e.preventDefault(); openPublish(); }}>{COPY.nav.publish}</a>
+            <a href="/register">{COPY.nav.connect}</a>
+            <a className="pill fire" href="#" onClick={(e) => { e.preventDefault(); openPublish(); }}>{COPY.nav.publish}</a>
           </nav>
         </header>
       </div>

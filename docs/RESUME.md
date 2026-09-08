@@ -19,6 +19,16 @@ Source of truth: **`~/Hermes/notes/app_accounts.md`**. Never commit secrets.
 - `/llms.txt` — agent-readable index + install manifest
 - `POST /api/feedback` — private intake, never public
 - `/api/mcp` — Streamable HTTP, fresh transport per request
+- `/admin` — owner back-office for invite codes + issued keys (gated by master key)
+- `/register` — self-serve invite-code redemption → MCP key
+
+## Recent changes (not yet on live)
+- Header nav: `Explore | The board | MCP | Publish` (Publish is now ember pill)
+- Terminal one-liner restored: `install docket from https://rundocket.xyz/mcp`
+- JSON config added as collapsible fallback below one-liner
+- Per-identity MCP keys + invite codes backend complete (committed `729d973` on `feature/per-identity-keys`)
+- Admin UI: `apps/web/app/admin/page.tsx` — committed in `729d973`
+- Mockups: `design-sketches/admin.html`, `mcp-setup.html`, `register.html`
 
 ## Deploy
 ```bash
@@ -29,48 +39,49 @@ vercel --prod
 ## Open decisions (not bugs)
 1. Idea-lifecycle web UI — agent-only for now; decide if human claim/build buttons wanted
 2. GitHub auto-deploy — Vercel needs repo write access (GitHub App or creds)
-3. **Per-identity MCP keys + invite codes** — plan in `docs/PER-IDENTITY-KEYS.md`. Current: shared `MCP_API_KEY` only; no self-serve. Web form is open to all; MCP key needed only for `/mcp`.
-4. `rundocket.xyz` MX — no email set up yet
+3. **Register contract** — backend expects `{ code, owner }`, register sketch expects `{ invite_code, owner }`. Pick one and reconcile. See `docs/PER-IDENTITY-KEYS.md`.
+4. `/connect` nav link — currently dangling; decide if it should point to `/register` or a new MCP setup docs page
+5. Terminal spacing — still being iterated on locally
+6. `rundocket.xyz` MX — no email set up yet
 
-## Next session: invite code system
-**Read first:** `docs/PER-IDENTITY-KEYS.md` — full plan with DB schema, endpoints, admin UI mockup, rate limiting, analytics.
+## Per-identity keys: what's built
+See `docs/PER-IDENTITY-KEYS.md` for full plan + backend details.
 
-**What to build:**
-- Migration 0004: `invite_codes` + `mcp_keys` tables + `mcp_rate_limits` table
-- Core store methods for key lookup + invite code validation
-- Auth layer: DB key lookup + scope checks + master key fallback
-- Server tool gating via scopes
-- Registration endpoint: `POST /api/mcp-keys/register` (invite code + email → key)
-- Admin endpoints: `GET/POST /api/admin/invite-codes`, `GET /api/admin/mcp-keys`, `POST /api/admin/mcp-keys/revoke`
-- Optional admin page: `apps/web/app/admin/page.tsx` (simple HTML UI)
-- Tests for all new endpoints + auth
+**Backend (committed `729d973` on `feature/per-identity-keys`):**
+- Migration 0004: `invite_codes`, `mcp_keys`, `mcp_rate_limits`
+- Core store: `packages/core/src/access.ts`
+- Auth: `packages/mcp/src/auth.ts` — `resolveAuth` with scopes + master key fallback
+- Server: `packages/mcp/src/server.ts` — tool gating via scopes
+- Admin endpoints: 4 routes (list/create/revoke codes, list/revoke keys)
+- Tests: core 61, mcp 35 (all green)
 
-**Delegation pattern:**
-- Agent 1 (backend): migrations + core + auth + server + backend tests
-- Agent 2 (web): registration + admin endpoints + frontend + web tests
-- Parent: integration + deploy to preview + merge to main
-
-**Design ref:** `design-sketches/admin.html` — admin UI mockup with stats, invite codes table, issued keys table, bulk code generation modal.
-
-**To start:**
-```bash
-cd ~/Hermes/apprank/app && nvm use 20
-git checkout -b feature/per-identity-keys
-```
+**Front-end:**
+- Admin page: `apps/web/app/admin/page.tsx` — committed
+- Register page + API route: untracked, needs contract resolution + commit
+- Landing.tsx + copy.ts + globals.css: uncommitted front-end updates from design work
 
 ## File map
 | File | What |
 |---|---|
 | `apps/web/app/api/mcp/route.ts` | MCP endpoint |
 | `apps/web/app/api/feedback/route.ts` | feedback intake |
+| `apps/web/app/admin/page.tsx` | admin back-office |
+| `apps/web/app/register/page.tsx` | invite-code signup (untracked) |
+| `apps/web/app/api/mcp-keys/register/route.ts` | register API (untracked) |
 | `packages/mcp/src/server.ts` | 9 MCP tools |
-| `packages/core/src/listings.ts` | store + validation |
+| `packages/mcp/src/auth.ts` | key-lookup + scope check |
+| `packages/core/src/access.ts` | store + validation |
 | `apps/web/lib/copy.ts` | all user-facing copy |
 | `apps/web/app/globals.css` | design tokens |
 | `supabase/migrations/0003_feedback.sql` | feedback schema |
+| `supabase/migrations/0004_invite_codes_and_keys.sql` | invite codes + keys |
+| `docs/PER-IDENTITY-KEYS.md` | per-identity keys plan |
 | `docs/ARCHITECTURE.md` | full orientation |
 | `docs/WORKSTREAMS.md` | branding / content / case-study brief |
-| `docs/CASE-STUDY.md` | product story |
+| `docs/CASE-STUDY.md` | product story (local only) |
+| `design-sketches/admin.html` | admin UI mockup |
+| `design-sketches/mcp-setup.html` | /connect page mockup |
+| `design-sketches/register.html` | /register page mockup |
 
 ## Don't
 - Re-explain the product (read the docs above if needed)

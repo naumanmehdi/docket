@@ -6,16 +6,23 @@ import {
   validateListing,
   type Store,
   type Validation,
+  type KeyScope,
 } from "@docket/core";
 
 export interface DocketServerDeps {
   store: Store;
   name?: string;
   version?: string;
-  /** Secret that unlocks private owner tools (currently top_feedback). When
-   * unset (or a request's key differs), those tools are refused — so linked
-   * third-party clients on the shared public key can submit feedback but can
-   * NOT read the private digest. */
+  /** Resolved scopes for the authenticated caller. When provided they gate every
+   * tool (read tools need `read`, write tools need `write`, owner tools need
+   * `admin`). When OMITTED the server treats the caller as full-access for
+   * read/write tools — intended for trusted hosts (tests, local CLI) that
+   * enforce auth at the edge. The private owner tool is still gated by
+   * `feedbackAdminKey` in that fallback mode. */
+  scopes?: KeyScope[];
+  /** Secret that unlocks private owner tools (currently top_feedback). Kept for
+   * backward compatibility with env-key auth; ignored when `scopes` is provided
+   * (in which case `admin` scope governs). */
   feedbackAdminKey?: string;
 }
 
@@ -115,6 +122,14 @@ export function createDocketServer(deps: DocketServerDeps): McpServer {
     { capabilities: { tools: {} } }
   );
 
+  // Scope gate. With `scopes` supplied, the caller is limited to them. Without
+  // it (trusted host / tests), every read+write tool is open and only the owner
+  // tool stays gated by feedbackAdminKey — preserving prior behaviour.
+  const may = (scope: KeyScope): boolean =>
+    deps.scopes ? deps.scopes.includes(scope) : scope !== "admin";
+  const denied = (tool: string, scope: KeyScope) =>
+    error(`this key cannot ${tool} — it needs the "${scope}" scope`);
+
   server.registerTool(
     "publish",
     {
@@ -129,6 +144,7 @@ export function createDocketServer(deps: DocketServerDeps): McpServer {
       inputSchema: publishInput,
     } as any,
 (async (raw: unknown) => {
+      if (!may("write")) return denied("publish", "write");
       const args = raw as PublishArgs;
       const validated = validateListing(args) as Validation;
       if (!validated.ok) return error(`Validation failed: ${validated.errors.join("; ")}`);
@@ -159,6 +175,7 @@ export function createDocketServer(deps: DocketServerDeps): McpServer {
       inputSchema: searchInput,
     } as any,
 (async (raw: unknown) => {
+      if (!may("read")) return denied("search", "read");
       const args = raw as SearchArgs;
       const rows = await deps.store.searchListings({
         query: args.query ?? undefined,
@@ -177,6 +194,7 @@ export function createDocketServer(deps: DocketServerDeps): McpServer {
       inputSchema: byIdInput,
     } as any,
 (async (raw: unknown) => {
+      if (!may("read")) return denied("get_listing", "read");
       const args = raw as ByIdArgs;
       const listing = await deps.store.getListing(args.id);
       if (!listing) return error(`No listing found for id ${args.id}`);
@@ -195,6 +213,7 @@ export function createDocketServer(deps: DocketServerDeps): McpServer {
       inputSchema: claimInput,
     } as any,
 (async (raw: unknown) => {
+      if (!may("write")) return denied("claim_idea", "write");
       const args = raw as ClaimArgs;
       const res = await deps.store.claimIdea(args.idea_id, args.author);
       if (!res.ok) return error(res.error);
@@ -213,6 +232,7 @@ export function createDocketServer(deps: DocketServerDeps): McpServer {
       inputSchema: updateClaimInput,
     } as any,
 (async (raw: unknown) => {
+      if (!may("write")) return denied("update_claim", "write");
       const args = raw as UpdateClaimArgs;
       const res = await deps.store.updateClaim(args.idea_id, args.author, {
         state: args.state,
@@ -235,6 +255,7 @@ export function createDocketServer(deps: DocketServerDeps): McpServer {
       inputSchema: authorInput,
     } as any,
 (async (raw: unknown) => {
+      if (!may("read")) return denied("my_ideas", "read");
       const args = raw as AuthorArgs;
       const rows = await deps.store.listMyIdeas(args.author);
       return text(rows.map((l) => listingSummary(l)));
@@ -250,6 +271,7 @@ export function createDocketServer(deps: DocketServerDeps): McpServer {
       inputSchema: byIdInput,
     } as any,
 (async (raw: unknown) => {
+      if (!may("read")) return denied("list_idea_activity", "read");
       const args = raw as ByIdArgs;
       const log = await deps.store.listIdeaActivity(args.id);
       return text(log.map((l) => ({ action: l.action, actor: l.actor, detail: l.detail, at: l.created_at.toISOString() })));
@@ -268,6 +290,7 @@ export function createDocketServer(deps: DocketServerDeps): McpServer {
       inputSchema: feedbackInput,
     } as any,
 (async (raw: unknown) => {
+      if (!may("write")) return denied("feedback", "write");
       const args = raw as FeedbackArgs;
       const f = await deps.store.submitFeedback({
         message: args.message,
@@ -290,7 +313,7 @@ export function createDocketServer(deps: DocketServerDeps): McpServer {
       inputSchema: topFeedbackInput,
     } as any,
 (async (raw: unknown) => {
-      if (!deps.feedbackAdminKey) {
+      if (!may("admin") && !deps.feedbackAdminKey) {
         return error("top_feedback requires the owner's admin key");
       }
       const args = raw as TopFeedbackArgs;
