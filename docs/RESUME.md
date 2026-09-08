@@ -20,6 +20,16 @@ Source of truth: **`~/Hermes/notes/app_accounts.md`**. Never commit secrets.
 - `POST /api/feedback` — private intake, never public
 - `/api/mcp` — Streamable HTTP, fresh transport per request
 
+## Recent changes (not yet on live)
+- Header nav: `Explore | The board | MCP | Publish` (Publish is now ember pill)
+- Terminal one-liner restored: `install docket from https://rundocket.xyz/mcp`
+- JSON config added as collapsible fallback below one-liner
+- Admin UI mockup: `design-sketches/admin.html`
+- `/connect` page mockup: `design-sketches/mcp-setup.html`
+- `/register` page mockup: `design-sketches/register.html`
+- Docs slimmed: RESUME, ARCHITECTURE, SECURITY, WORKSTREAMS, CASE-STUDY
+- CASE-STUDY.md kept local/private, ignored in git
+
 ## Deploy
 ```bash
 cd ~/Hermes/apprank/app && nvm use 20
@@ -31,9 +41,10 @@ vercel --prod
 2. GitHub auto-deploy — Vercel needs repo write access (GitHub App or creds)
 3. **Per-identity MCP keys + invite codes** — plan in `docs/PER-IDENTITY-KEYS.md`. Current: shared `MCP_API_KEY` only; no self-serve. Web form is open to all; MCP key needed only for `/mcp`.
 4. `rundocket.xyz` MX — no email set up yet
+5. Terminal spacing — still being iterated on locally
 
 ## Next session: invite code system
-**Read first:** `docs/PER-IDENTITY-KEYS.md` — full plan with DB schema, endpoints, admin UI mockup, rate limiting, analytics.
+**Read first:** `docs/PER-IDENTITY-KEYS.md` — full plan with DB schema, endpoints, admin UI, rate limiting, analytics.
 
 **What to build:**
 - Migration 0004: `invite_codes` + `mcp_keys` tables + `mcp_rate_limits` table
@@ -50,7 +61,10 @@ vercel --prod
 - Agent 2 (web): registration + admin endpoints + frontend + web tests
 - Parent: integration + deploy to preview + merge to main
 
-**Design ref:** `design-sketches/admin.html` — admin UI mockup with stats, invite codes table, issued keys table, bulk code generation modal.
+**Design refs:**
+- `design-sketches/admin.html` — admin UI mockup
+- `design-sketches/mcp-setup.html` — `/connect` page mockup
+- `design-sketches/register.html` — `/register` page mockup
 
 **To start:**
 ```bash
@@ -68,9 +82,13 @@ git checkout -b feature/per-identity-keys
 | `apps/web/lib/copy.ts` | all user-facing copy |
 | `apps/web/app/globals.css` | design tokens |
 | `supabase/migrations/0003_feedback.sql` | feedback schema |
+| `docs/PER-IDENTITY-KEYS.md` | per-identity keys plan |
 | `docs/ARCHITECTURE.md` | full orientation |
 | `docs/WORKSTREAMS.md` | branding / content / case-study brief |
-| `docs/CASE-STUDY.md` | product story |
+| `docs/CASE-STUDY.md` | product story (local only) |
+| `design-sketches/admin.html` | admin UI mockup |
+| `design-sketches/mcp-setup.html` | /connect page mockup |
+| `design-sketches/register.html` | /register page mockup |
 
 ## Don't
 - Re-explain the product (read the docs above if needed)
