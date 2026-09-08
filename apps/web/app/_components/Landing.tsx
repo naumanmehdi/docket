@@ -1,5 +1,5 @@
 "use client";
-
+// docket / — landing + board shell.
 import { useState } from "react";
 import { SITE } from "@/lib/site";
 import { COPY } from "@/lib/copy";
@@ -7,10 +7,18 @@ import Catalog from "./Catalog";
 import PublishModal from "./PublishModal";
 import type { ListingRow } from "@/lib/listing";
 
+interface Result {
+  plaintext: string;
+  scopes: string[];
+  owner: string;
+}
+
 export default function Landing({ rows }: { rows: ListingRow[] }) {
   const [publishOpen, setPublishOpen] = useState(false);
+  const [registerOpen, setRegisterOpen] = useState(false);
   const mcpUrl = process.env.NEXT_PUBLIC_MCP_URL ?? `https://${SITE.domain}/mcp`;
   const openPublish = () => setPublishOpen(true);
+  const openRegister = () => setRegisterOpen(true);
 
   return (
     <div className="wrap">
@@ -23,10 +31,12 @@ export default function Landing({ rows }: { rows: ListingRow[] }) {
           <nav>
             <a href="#explore">{COPY.nav.explore}</a>
             <a href="#board">{COPY.nav.board}</a>
-            <a href="/register">{COPY.nav.connect}</a>
-            <a className="pill fire" href="#" onClick={(e) => { e.preventDefault(); openPublish(); }}>{COPY.nav.publish}</a>
+            <a href="/connect">{COPY.nav.connect}</a>
           </nav>
         </header>
+        <div className="top-cta">
+          <button className="btn" onClick={openRegister}>{COPY.nav.register}</button>
+        </div>
       </div>
 
       {/* HERO — editorial split */}
@@ -53,7 +63,7 @@ export default function Landing({ rows }: { rows: ListingRow[] }) {
           <div className="term">
             <div className="term-head"><span className="t">{COPY.terminal.title}</span><span className="live">live</span></div>
             <div className="term-body">
-              <div className="ln"><span className="prompt">➜</span><span className="out step">step 1 — connect your agent</span></div>
+              <div className="ln"><span className="prompt">➜</span><span className="out step">step 1 — add MCP server</span></div>
               <div className="ln"><span className="prompt">➜</span><span className="cmd">{COPY.terminal.install}</span></div>
               <div className="ln"><span className="prompt">➜</span><span className="out step">step 2 — publish or find</span></div>
               <div className="ln"><span className="prompt">➜</span><span className="cmd">{COPY.terminal.publish}</span><span className="out"><span className="ok">✓</span> {COPY.terminal.publishOut}</span></div>
@@ -95,6 +105,131 @@ export default function Landing({ rows }: { rows: ListingRow[] }) {
       </footer>
 
       <PublishModal open={publishOpen} onClose={() => setPublishOpen(false)} />
+      {registerOpen && (
+        <div className="panel-wrap">
+          <div className="panel">
+            <div className="panel-head">
+              <span className="panel-title">Get an MCP key</span>
+              <button className="panel-back" onClick={() => setRegisterOpen(false)}>← back to board</button>
+            </div>
+            <RegisterForm onDone={() => setRegisterOpen(false)} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function RegisterForm({ onDone }: { onDone: () => void }) {
+  const [code, setCode] = useState("");
+  const [owner, setOwner] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [result, setResult] = useState<Result | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setResult(null);
+    setBusy(true);
+    try {
+      const res = await fetch("/api/mcp-keys/register", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ code: code.trim(), owner: owner.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.errors?.[0] ?? "Registration failed.");
+      setResult(data as Result);
+      onDone();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Registration failed.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const copyKey = async () => {
+    if (!result) return;
+    try {
+      await navigator.clipboard.writeText(result.plaintext);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* clipboard unavailable */
+    }
+  };
+
+  return (
+    <div className="reg-inner">
+      <style>{`
+        .panel-wrap { position:fixed; inset:0; z-index:50; display:flex; justify-content:flex-end; background:rgba(38,25,15,0.35); }
+        .panel { width:min(460px, 94vw); height:100%; background:var(--paper); border-left:1px solid var(--hair); box-shadow:-12px 0 40px -20px rgba(38,25,15,0.35); display:flex; flex-direction:column; }
+        .panel-head { display:flex; align-items:center; justify-content:space-between; padding:16px 18px; border-bottom:1px solid var(--hair); }
+        .panel-title { font-weight:600; }
+        .panel-back { background:transparent; color:var(--mut); border:1px solid var(--hair); padding:6px 14px; border-radius:999px; cursor:pointer; font-size:12px; font-weight:500; }
+        .panel-back:hover{color:var(--ember); border-color:var(--ember);}
+        .reg-inner { flex:1; padding:18px; overflow:auto; }
+        .reg-inner .card { background:var(--card); border:1px solid var(--hair); border-radius:22px; padding:24px; box-shadow:0 24px 50px -28px rgba(66,44,20,.3); position:relative; overflow:hidden; }
+        .reg-inner .card::before { content:""; position:absolute; left:24px; top:-12px; width:84px; height:20px; background:var(--ember); border-radius:9px 9px 0 0; }
+        .reg-inner h1 { font-family:"Fraunces",serif; font-size:22px; font-weight:500; margin:18px 0 6px; }
+        .reg-inner .lede { color:var(--mut); font-size:13.5px; margin:0 0 6px; line-height:1.6; }
+        .reg-inner .scopes { color:var(--faint); font-size:12.5px; margin:0 0 16px; }
+        .reg-inner label { display:block; font-size:12px; font-weight:600; color:var(--ink); margin:12px 0 6px; }
+        .reg-inner input { width:100%; background:var(--paper); border:1px solid var(--hair); border-radius:12px; padding:12px 14px; font-size:14.5px; color:var(--ink); outline:none; font-family:inherit; }
+        .reg-inner input:focus { border-color:var(--ember); }
+        .reg-inner .btn { width:100%; margin-top:16px; background:var(--ember); color:#fff6ec; border:none; font-weight:600; font-size:15px; padding:14px; border-radius:12px; cursor:pointer; }
+        .reg-inner .btn:disabled { opacity:.5; cursor:default; }
+        .reg-inner .err { margin-top:14px; border-radius:12px; padding:11px 13px; font-size:14px; background:rgba(189,95,47,.12); color:var(--ember-deep); }
+        .reg-inner .ok { margin-top:18px; border:1px dashed var(--ember); border-radius:14px; padding:14px; background:var(--ember-soft); }
+        .reg-inner .ok .lbl { font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--mut); font-weight:600; margin-bottom:8px; }
+        .reg-inner .keyrow { display:flex; align-items:center; gap:10px; }
+        .reg-inner .key { flex:1; font-family:"DM Mono",monospace; font-size:13px; background:#fff; border:1px solid var(--hair); border-radius:10px; padding:11px 12px; word-break:break-all; }
+        .reg-inner .copy { background:var(--ink); color:var(--paper); border:none; border-radius:10px; padding:11px 16px; font-weight:600; cursor:pointer; font-size:13px; white-space:nowrap; }
+        .reg-inner .warn { font-size:12.5px; color:var(--mut); margin-top:12px; line-height:1.6; }
+        .reg-inner .warn b{color:var(--ink);}
+      `}</style>
+
+      <div className="card">
+        <div className="top">
+          <span className="mark">d</span>
+          <span className="brand">docket</span>
+        </div>
+        {!result ? (
+          <form onSubmit={submit}>
+            <h1>Get an agent key</h1>
+            <p className="lede">Redeem your invite code for a per-identity key to talk to docket over MCP.</p>
+            <p className="scopes">Issued keys get read + write scopes. The key is shown once.</p>
+            <label htmlFor="code">Invite code</label>
+            <input id="code" value={code} onChange={(e) => setCode(e.target.value)} placeholder="DOCKET-XXXXXX" autoComplete="off" />
+            <label htmlFor="owner">Your email or handle</label>
+            <input id="owner" value={owner} onChange={(e) => setOwner(e.target.value)} placeholder="you@example.com or @handle" autoComplete="email" />
+            {error && <div className="err">{error}</div>}
+            <button className="btn" type="submit" disabled={busy || !code.trim() || !owner.trim()}>
+              {busy ? "issuing…" : "Get my key"}
+            </button>
+          </form>
+        ) : (
+          <div>
+            <h1>Your key is ready</h1>
+            <p className="lede">Copy it now — it won&apos;t be shown again. Use it as the bearer token when you connect your MCP client to <span className="mono">/mcp</span>.</p>
+            <div className="ok">
+              <div className="lbl">Your key (show once)</div>
+              <div className="keyrow">
+                <div className="key">{result.plaintext}</div>
+                <button className="copy" onClick={copyKey}>{copied ? "copied" : "copy"}</button>
+              </div>
+            </div>
+            <div className="warn">
+              <b>Example client config:</b>
+              <br />
+              <span className="mono">Authorization: Bearer {result.plaintext}</span>
+            </div>
+            <button className="btn" style={{marginTop:14}} onClick={onDone}>Close</button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

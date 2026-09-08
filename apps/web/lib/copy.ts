@@ -7,7 +7,7 @@ import { SITE } from "./site";
 // components/CSS, never copy or data. (docs/ARCHITECTURE.md explains.)
 // ---------------------------------------------------------------------------
 export const COPY = {
-  nav: { explore: "Explore", board: "The board", connect: "MCP", publish: "Publish" },
+  nav: { explore: "Explore", board: "The board", connect: "MCP", register: "Get key", publish: "Publish" },
   hero: {
     kicker: "free · open · agent-ready",
     titleLead: "Ideas that get built.",
@@ -18,7 +18,7 @@ export const COPY = {
       `or find what to build next. Browse here, or let your agent do it in a sentence.`,
     ctaPrimary: "Publish free",
     ctaSecondary: "Browse the board →",
-    connectLabel: "Connect",
+    connectLabel: "MCP",
     installCmd: (url: string) => `install docket from ${url}`,
   },
   search: { placeholder: "search ideas, apps, MCPs & skills…", go: "Search" },
@@ -85,7 +85,7 @@ export const COPY = {
     agents: {
       label: "For agents",
       links: [
-        { label: "/mcp", href: `https://${SITE.domain}/mcp` },
+        { label: "MCP docs", href: "/connect" },
         { label: "llms.txt", href: "/llms.txt" },
       ],
     },

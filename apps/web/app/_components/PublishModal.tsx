@@ -193,7 +193,7 @@ export default function PublishModal({ open, onClose }: { open: boolean; onClose
             <p className="step-intro">Your agent does the publish — three steps, one sentence each.</p>
             <div className="step">
               <span className="step-n">1</span>
-              <label className="mlab">Connect your agent</label>
+              <label className="mlab">Add MCP server</label>
               <div className="agent">Add a remote MCP server: <b>install docket from https://{SITE.domain}/mcp</b></div>
             </div>
             <div className="step">

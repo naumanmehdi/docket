@@ -17,7 +17,7 @@ export async function GET() {
   lines.push("");
 
   // --- Install manifest (agent-native self-install, D13) ---
-  lines.push(`## Connect (MCP)`);
+  lines.push(`## MCP`);
   lines.push(
     `To let an agent publish to and search ${BRAND.name}, add a remote MCP server at: ${mcpUrl}`
   );
