@@ -34,6 +34,11 @@ function clean(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
+/** Strip HTML tags to prevent stored XSS in text fields. */
+function stripHtml(value: string): string {
+  return value.replace(/<[^>]*>/g, "");
+}
+
 /** Returns true when the kind is a "built" artifact that needs a resolvable URL. */
 export function kindNeedsUrl(kind: Kind): boolean {
   return kind === "app" || kind === "mcp" || kind === "skill";
@@ -70,15 +75,15 @@ export function validateListing(raw: unknown): Validation {
   else if (!(KINDS as string[]).includes(kindRaw))
     errors.push("kind must be one of: idea, app, mcp, skill");
 
-  const name = clean(o.name);
-  const tagline = clean(o.tagline);
-  const description = clean(o.description) || null;
+  const name = stripHtml(clean(o.name));
+  const tagline = stripHtml(clean(o.tagline));
+  const description = stripHtml(clean(o.description)) || null;
   const url = clean(o.url);
   const repoUrl = clean(o.repo_url) || null;
-  const category = clean(o.category) || null;
-  const authorRaw = clean(o.author);
-  const authorContact = clean(o.author_contact) || null;
-  const xHandleRaw = clean(o.x_handle);
+  const category = stripHtml(clean(o.category)) || null;
+  const authorRaw = stripHtml(clean(o.author));
+  const authorContact = stripHtml(clean(o.author_contact)) || null;
+  const xHandleRaw = stripHtml(clean(o.x_handle));
 
   if (!name) errors.push("name is required");
   else if (name.length > NAME_MAX) errors.push(`name must be ${NAME_MAX} characters or fewer`);
