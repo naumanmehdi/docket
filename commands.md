@@ -28,18 +28,19 @@ cd ~/Hermes/apprank/app && nvm use 20 && vercel
 cd ~/Hermes/apprank/app && nvm use 20 && vercel --prod
 ```
 
-## Current state
-- `/mcp-docs` and `/register` are live in code
-- Favicon + “MCP” wording done
-- Admin back-office committed
-- Per-identity MCP keys + invite codes implemented
-- Staging/production deploy not done yet
+## Current state (verified Sep 9, 2026)
+- **Production deploy IS DONE** — site live at https://rundocket.xyz (31 items on board)
+- `/`, `/mcp-docs`, `/register`, `/admin`, `/mcp`, `/llms.txt` all live
+- Soft-cream editorial + binder-tab design live
+- Per-identity MCP keys + invite codes live
+- XSS protection verified (stripHtml in validation)
+- Admin back-office live
 
 ## What to do next
-1. Read `docs/RESUME.md`
-2. Deploy to staging, get user approval
-3. Admin E2E verification
-4. Rate-limiting + usage logging (see `docs/PER-IDENTITY-KEYS.md`)
+1. Read `docs/RESUME.md` and `docs/PRODUCTION-CHECKLIST.md`
+2. Verify production checklist items (rate limits, test data cleanup, key rotation per-env)
+3. Admin E2E verification on production
+4. Monitor error logs
 
 ## Rules
 - Don’t rename DB `apprank`
