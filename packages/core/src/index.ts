@@ -8,8 +8,6 @@ export type { RateLimitResult } from "./ratelimit.js";
 export {
   KINDS,
   validateListing,
-  validHandle,
-  kindNeedsUrl,
 } from "./validate.js";
 export type { Kind, ListingInput, Validation } from "./validate.js";
 export { createStore, ACTIVE_CLAIM_CAP } from "./listings.js";

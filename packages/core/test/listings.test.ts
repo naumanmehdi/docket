@@ -94,36 +94,6 @@ describe("createStore.getListing", () => {
   });
 });
 
-describe("createStore.listLatest", () => {
-  it("returns most-recently-created first", async () => {
-    await store.insertListing({ ...validListing, name: "First" });
-    await new Promise((r) => setTimeout(r, 5));
-    await store.insertListing({ ...validListing, name: "Second" });
-
-    const rows = await store.listLatest(10);
-    expect(rows[0]?.name).toBe("Second");
-    expect(rows[1]?.name).toBe("First");
-  });
-
-  it("only returns live listings", async () => {
-    await store.insertListing({ ...validListing, name: "Visible" });
-    const { id } = await store.insertListing({ ...validListing, name: "Hidden" });
-    await pool.query("update listings set status = 'pending' where id = $1", [id]);
-
-    const rows = await store.listLatest(10);
-    expect(rows).toHaveLength(1);
-    expect(rows[0]?.name).toBe("Visible");
-  });
-
-  it("filters by kind", async () => {
-    await store.insertListing(idea);
-    await store.insertListing(validListing);
-    const rows = await store.listLatest({ kind: "idea" });
-    expect(rows).toHaveLength(1);
-    expect(rows[0]?.kind).toBe("idea");
-  });
-});
-
 describe("createStore.searchListings", () => {
   it("matches across name/tagline by substring", async () => {
     await store.insertListing(validListing); // "Turns meetings into notes"
@@ -145,8 +115,8 @@ describe("createStore.searchListings", () => {
     await store.insertListing(validListing); // not an idea
 
     // claim the first idea
-    const published = await store.listLatest({ kind: "idea" });
-    await store.claimIdea(published[0]!.id, "builder1");
+    const ideas = await store.searchListings({ kind: "idea" });
+    await store.claimIdea(ideas[0]!.id, "builder1");
 
     const rows = await store.searchListings({ claimableOnly: true });
     expect(rows).toHaveLength(1);

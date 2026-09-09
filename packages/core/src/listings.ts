@@ -80,8 +80,6 @@ export const FEEDBACK_MESSAGE_MAX = 4000;
 export interface Store {
   insertListing(input: ListingInput): Promise<Listing>;
   getListing(id: string): Promise<Listing | null>;
-  listLatest(opts?: { limit?: number; kind?: Kind }): Promise<Listing[]>;
-  listSpotlight(limit?: number): Promise<Listing[]>;
   searchListings(opts?: SearchOptions): Promise<Listing[]>;
   claimIdea(ideaId: string, actor: string): Promise<ClaimResult>;
   updateClaim(
@@ -202,31 +200,6 @@ export function createStore(pool: pg.Pool): Store {
   const getListing = async (id: string): Promise<Listing | null> => {
     const { rows } = await pool.query(`${ROW_SELECT} where id = $1`, [id]);
     return rows[0] ? mapListing(rows[0]) : null;
-  };
-
-  const listLatest = async (opts?: { limit?: number; kind?: Kind }): Promise<Listing[]> => {
-    const limit = clampLimit(opts?.limit, 10);
-    const args: unknown[] = [limit];
-    let where = `status = 'live'`;
-    if (opts?.kind) {
-      args.push(opts.kind);
-      where += ` and kind = $2`;
-    }
-    const { rows } = await pool.query(
-      `${ROW_SELECT} where ${where} order by created_at desc limit $1`,
-      args
-    );
-    return rows.map(mapListing);
-  };
-
-  const listSpotlight = async (limit = 6): Promise<Listing[]> => {
-    const n = clampLimit(limit, 6);
-    const { rows } = await pool.query(
-      `${ROW_SELECT} where status = 'live' and spotlighted = true
-       order by created_at desc limit $1`,
-      [n]
-    );
-    return rows.map(mapListing);
   };
 
   const searchListings = async (opts?: SearchOptions): Promise<Listing[]> => {
@@ -391,8 +364,6 @@ export function createStore(pool: pg.Pool): Store {
   return {
     insertListing,
     getListing,
-    listLatest,
-    listSpotlight,
     searchListings,
     claimIdea,
     updateClaim,
