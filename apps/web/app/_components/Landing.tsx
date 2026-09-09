@@ -31,7 +31,7 @@ export default function Landing({ rows }: { rows: ListingRow[] }) {
           <nav>
             <a href="#explore">{COPY.nav.explore}</a>
             <a href="#board">{COPY.nav.board}</a>
-            <a href="/connect">{COPY.nav.connect}</a>
+            <a href="/mcp-docs">{COPY.nav.connect}</a>
           </nav>
         </header>
         <div className="top-cta">

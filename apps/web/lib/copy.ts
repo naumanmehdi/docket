@@ -85,7 +85,7 @@ export const COPY = {
     agents: {
       label: "For agents",
       links: [
-        { label: "MCP docs", href: "/connect" },
+        { label: "MCP docs", href: "/mcp-docs" },
         { label: "llms.txt", href: "/llms.txt" },
       ],
     },
