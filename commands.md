@@ -32,14 +32,14 @@ cd ~/Hermes/apprank/app && nvm use 20 && vercel --prod
 - `/mcp-docs` and `/register` are live in code
 - Favicon + “MCP” wording done
 - Admin back-office committed
+- Per-identity MCP keys + invite codes implemented
 - Staging/production deploy not done yet
 
 ## What to do next
 1. Read `docs/RESUME.md`
 2. Deploy to staging, get user approval
-3. Finish `/connect` cleanup → `/mcp-docs`
-4. Admin E2E verification
-5. Rate-limiting + usage logging (see `docs/PER-IDENTITY-KEYS.md`)
+3. Admin E2E verification
+4. Rate-limiting + usage logging (see `docs/PER-IDENTITY-KEYS.md`)
 
 ## Rules
 - Don’t rename DB `apprank`

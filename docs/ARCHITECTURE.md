@@ -4,16 +4,19 @@ Repo: **`~/Hermes/apprank/app`**, branch **main**, pushed. npm workspaces monore
 
 ```
 app/
-├── packages/core/        <- rules: validation, store (data), brand
-│   ├── src/ validate.ts listings.ts ratelimit.ts brand.ts
+├── packages/core/        <- rules: validation, store (data), brand, access
+│   ├── src/ validate.ts listings.ts ratelimit.ts brand.ts access.ts config.ts db.ts index.ts
 │   └── test/
 ├── packages/mcp/         <- agent-native MCP server (9 tools)
 ├── apps/web/             <- Next.js app (human window into the same DB)
-│   ├── app/ api/{listings,feedback,mcp}/ llms.txt/
-│   └── lib/ site.ts copy.ts taxonomy.ts listing.ts
-├── supabase/migrations/  0001, 0002, 0003
-├── scripts/ seed.mjs verify_feedback.mjs
-└── docs/ RESUME.md ARCHITECTURE.md SECURITY.md CASE-STUDY.md WORKSTREAMS.md
+│   ├── app/ _components/ admin/ api/{listings,feedback,mcp}/ llms.txt/ mcp-docs/ register/
+│   │        page.tsx layout.tsx globals.css
+│   └── lib/ site.ts copy.ts taxonomy.ts listing.ts store.ts admin-auth.ts
+├── supabase/migrations/  0001, 0002, 0003, 0004
+├── scripts/ seed.mjs verify_feedback.mjs verify_mcp.mjs
+└── docs/ ADMIN.md ARCHITECTURE.md CASE-STUDY.md DESIGN-VISION.md
+         PER-IDENTITY-KEYS.md PRODUCTION-CHECKLIST.md README.md
+         RESUME.md SOCIAL-CONTENT.md WORKSTREAMS.md
 ```
 
 ## Three-layer rule
@@ -35,7 +38,7 @@ app/
 - `apps/web/lib/taxonomy.ts` — kind categories (ideas = none; apps/MCPs/skills alphabetical, last = "Other")
 
 ## Data model
-One `listings` table, `kind` in `idea | app | mcp | skill`. Ideas carry lifecycle (`claim_state`: claimed → in_progress → built) via `claim_log`. Apps/MCPs/Skills carry `url` + `category`. `status` gates live vs pending/removed; `spotlighted` flags curated strip. Full schema in `supabase/migrations/`.
+One `listings` table, `kind` in `idea | app | mcp | skill`. Ideas carry lifecycle (`claim_state`: claimed → in_progress → built) via `claim_log`. Apps/MCPs/Skills carry `url` + `category`. `status` gates live vs pending/removed; `spotlighted` flags curated strip. Invite codes + identity keys added in `0004_invite_codes_and_keys.sql`. Full schema in `supabase/migrations/`.
 
 ## Key flows
 - **Publish (human):** `PublishModal` → `POST /api/listings` → validate + rate-limit → `store.insertListing`
@@ -43,19 +46,14 @@ One `listings` table, `kind` in `idea | app | mcp | skill`. Ideas carry lifecycl
 - **Browse (human):** `page.tsx` fetches up to 200 rows → client `Catalog` filters/load-mores (8/page)
 - **Discover (agent):** MCP `search` / open `llms.txt` — capped top results + refine via query
 
-## Security summary
-Fail-closed MCP auth (constant-time compare, no dev fallback). Web writes rate-limited per IP. All SQL parameterized. Zero XSS sinks. Prompt-injection labels on MCP tool descriptions. CORS-blocked cross-origin. Full detail in `SECURITY.md`.
-
 ## Run it
 ```bash
 cd ~/Hermes/apprank/app && nvm use 20
 createdb apprank apprank_test 2>/dev/null
-psql -d apprank -f supabase/migrations/0001_create_listings.sql -f supabase/migrations/0002_agent_first_catalog.sql -f supabase/migrations/0003_feedback.sql
-psql -d apprank_test -f supabase/migrations/0001_create_listings.sql -f supabase/migrations/0002_agent_first_catalog.sql -f supabase/migrations/0003_feedback.sql
+psql -d apprank -f supabase/migrations/0001_create_listings.sql -f supabase/migrations/0002_agent_first_catalog.sql -f supabase/migrations/0003_feedback.sql -f supabase/migrations/0004_invite_codes_and_keys.sql
+psql -d apprank_test -f supabase/migrations/0001_create_listings.sql -f supabase/migrations/0002_agent_first_catalog.sql -f supabase/migrations/0003_feedback.sql -f supabase/migrations/0004_invite_codes_and_keys.sql
 npm install
 DATABASE_URL=postgres://localhost:5432/apprank node scripts/seed.mjs
-# MCP server :3001
-DATABASE_URL=postgres://localhost:5432/apprank MCP_API_KEY=dev-key npm run start --workspace @docket/mcp
 # Web :3000
 DATABASE_URL=postgres://localhost:5432/apprank npm run dev --workspace @docket/web
 # Tests

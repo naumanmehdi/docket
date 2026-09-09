@@ -20,10 +20,15 @@ built. An agent that does the paperwork."
     category descriptions, the "Everything/board" sub-lines. Keep warm, specific, no AI-isms
     (banned: "Elevate", "Seamless", "Next-Gen", cream/coral slop; no emoji-as-icons).
   - Website footer/nav copy (already structured in copy.ts — verify tone).
-  - A favicon / og:image (docket-tab mark exists in CSS; no real asset yet). `app/apple-icon` or
-    `/public` — currently missing (SECURITY/audit noted "missing favicon" as a gap).
-  - llms.txt copy: it lists tools + board; keep it accurate (9 MCP tools now).
-- **Deliverables:** edit copy.ts (and any assets) back on `redesign/soft-cream`; run the web build +
+  - ~~A favicon / og:image (docket-tab mark exists in CSS; no real asset yet). `app/apple-icon` or~~
+    ~~`/public` — currently missing (SECURITY/audit noted "missing favicon" as a gap).~~ 
+    **Favicon exists** at `apps/web/public/favicon.svg` (espresso tile + ember "d") and is wired in
+    `layout.tsx`. An `og:image` is still missing — generate one (1200×630) from the soft-cream
+    motif for social previews.
+  - llms.txt copy: it lists tools + board; keep it accurate. **Currently lists 7 tools but the MCP
+    server has 9** — `feedback` and `top_feedback` are missing from the install manifest. Update
+    the `Tools:` line in `apps/web/app/llms.txt/route.ts` to include all 9.
+- **Deliverables:** edit copy.ts (and any assets) back on the current design branch; run the web build +
   tests before committing.
 
 ## 2 · CONTENT (board + docs)
@@ -47,13 +52,14 @@ turn into a Show-HN post / portfolio piece / intro blurb.
   - Design: went from a generic dark-SaaS ("AI-slop") to a distinct soft-cream + binder-tab "docket"
     motif — name-metaphor design, single accent, editorial serif (taste-skill-informed).
   - Security posture: fail-closed auth, two-tier MCP keys, parameterized SQL, no-lock-in data.
+  - **Per-identity keys are live** — invite-code-gated `/register` issues scoped keys (migration 0004).
 - **Tone:** specific numbers over vibes; honest about deferrals + the one dependency-audit caveat
   (`npm audit` dev-only findings). No hype, no "revolutionary" cliches.
-- **Deliverable:** `docs/CASE-STUDY.md` (new file), committed on `redesign/soft-cream`.
+- **Deliverable:** `docs/CASE-STUDY.md` (new file), committed on the current design branch.
 
 ## Constraints (same taste rules as the build)
 - Warm-dark ethos, but the shipped design is **light soft-cream** now — match THAT.
 - No emoji as icons; Fraunces serif sparingly for display; specific human copy over generic value props.
-- Keep everything on branch `redesign/soft-cream`; run `npm run build --workspace @docket/web` +
+- Keep everything on the current design branch; run `npm run build --workspace @docket/web` +
   `DATABASE_URL_TEST=postgres://localhost:5432/apprank_test npm test` before committing if you touched code or copy.
 - Never rename the DB/folder `apprank`; never commit secrets; never touch another profile's files.

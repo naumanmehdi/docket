@@ -24,7 +24,7 @@ export async function GET() {
   lines.push(
     `Authenticate with a bearer API key. Ask your agent to install it from ${mcpUrl} and it can self-configure.`
   );
-  lines.push("Tools: publish, search, get_listing, claim_idea, update_claim, my_ideas, list_idea_activity");
+  lines.push("Tools: publish, search, get_listing, claim_idea, update_claim, my_ideas, list_idea_activity, feedback, top_feedback");
   lines.push("");
   lines.push(`## What you can ask your agent`);
   lines.push(`- "publish my idea about ..." (publish, kind=idea)`);

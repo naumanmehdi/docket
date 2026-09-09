@@ -1,9 +1,10 @@
 # DESIGN VISION — the "mind-blown" end concept (NOT built yet)
 
 > **Status: CONCEPT / ASPIRATION.** This is the user's *end-goal* design vision. The current
-> live front-end is the clean warm-dark "D" design (see `ARCHITECTURE.md` + `globals.css`) —
-> a solid, launchable base. This doc captures where the design should go NEXT, so it's ready
-> to iterate and execute without re-discovering the intent. Do not treat as current scope.
+> live front-end is the **soft-cream editorial** design (binder-tab motif, cream paper, espresso ink,
+> single ember accent — see `ARCHITECTURE.md` + `globals.css`) — a solid, launchable base. This doc
+> captures where the design should go NEXT, so it's ready to iterate and execute without
+> re-discovering the intent. Do not treat as current scope.
 
 ---
 

@@ -13,9 +13,9 @@
 - **Error handling:** API routes return generic 500s; no internal detail leaked. Board fetch degrades to empty state if DB unavailable.
 
 ## Dependency audit
-- **3 'high' remain** (postcss = build-time CSS only; sharp = libvips image-opt, never invoked — no `next/image` in source).
-- Neither is exploitable at runtime.
-- **Next pinned 16.2.12** (declared at repo root so npm hoists it and Vercel detects it). 16.3.4 builds but **cannot deploy** on the current Vercel pipeline (immutable-static-upload incompatibility).
+- **next 16.2.12: CRITICAL** — unauthenticated RCE on Windows-hosted servers (GHSA-p293-qw3h-jr36). Not exploitable on Vercel (Linux). Pinned for Vercel deploy compatibility (16.3.4 builds but cannot deploy on current pipeline).
+- **postcss: HIGH** — XSS via unescaped `</style>` in CSS stringify output. Build-time only, not invoked at runtime.
+- **sharp: HIGH** — libvips CVEs (CVE-2026-33327, CVE-2026-33328, CVE-2026-35590, CVE-2026-35591). sharp is a next dependency but `next/image` is never used in source — not exploitable at runtime.
 - Re-run `npm audit fix --force` when Vercel supports next 16.3+ deploy.
 
 ## Future hardening (not MVP)

@@ -21,9 +21,8 @@ agent to find you something to build.
 packages/core/   single source of truth: kind-aware validation, Postgres data layer, brand
 packages/mcp/    the MCP server (publish/search/get_listing + lifecycle verbs)
 apps/web/        Next.js app — Landing/Catalog/PublishModal (warm-dark, design D)
-supabase/migrations/  0001, 0002 (agent-first schema + idea lifecycle)
+supabase/migrations/  0001–0004 (agent-first schema, idea lifecycle, feedback, invite codes + keys)
 scripts/seed.mjs       seed the dev board across all kinds
-design-sketches/       throwaway HTML mockups (variant D → became the live design)
 docs/                  orientation + architecture + design vision
 ```
 
@@ -32,10 +31,10 @@ Requires Node ≥ 20 (`nvm use 20`) and Postgres running.
 
 ```bash
 npm install
-# databases + migrations
+# databases + migrations (all four)
 createdb apprank; createdb apprank_test
-psql -d apprank      -f supabase/migrations/0001_create_listings.sql -f supabase/migrations/0002_agent_first_catalog.sql
-psql -d apprank_test -f supabase/migrations/0001_create_listings.sql -f supabase/migrations/0002_agent_first_catalog.sql
+psql -d apprank      -f supabase/migrations/0001_create_listings.sql -f supabase/migrations/0002_agent_first_catalog.sql -f supabase/migrations/0003_feedback.sql -f supabase/migrations/0004_invite_codes_and_keys.sql
+psql -d apprank_test -f supabase/migrations/0001_create_listings.sql -f supabase/migrations/0002_agent_first_catalog.sql -f supabase/migrations/0003_feedback.sql -f supabase/migrations/0004_invite_codes_and_keys.sql
 # seed the dev board
 DATABASE_URL=postgres://localhost:5432/apprank node scripts/seed.mjs
 # web app :3000

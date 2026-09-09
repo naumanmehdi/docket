@@ -9,23 +9,23 @@ Live at **https://rundocket.xyz**. Branch **main**, pushed to GitHub (`naumanmeh
 - DB: `apprank` (local + prod; don't rename)
 
 ## Secrets
-- `DATABASE_URL`, `MCP_API_KEY`, `MCP_ADMIN_KEY` (Vercel envs)
+- `DATABASE_URL`, `MCP_API_KEY`, `MCP_ADMIN_KEY` (Vercel envs, all Secret type)
 - Admin key doc: `docs/ADMIN.md`
 - Never commit secrets
 
 ## What ships
 - `/` — soft-cream editorial board, binder-tab motif
-- `/mcp` — Streamable HTTP agent endpoint, 2-tier auth
-- `/mcp-docs` — agent setup docs (Claude/Hermes/generic)
+- `/mcp` — Streamable HTTP agent endpoint, 10 MCP tools
+- `/mcp-docs` — agent setup docs (Claude/DeepSeek/Hermes/generic)
 - `/register` — invite-code signup → per-identity MCP key
 - `/admin` — owner back-office (codes/keys/revoke)
 - `/llms.txt` — agent-readable index
+- `POST /api/listings` — publish (open, no key needed)
 - `POST /api/feedback` — private intake
 
 ## Local setup
 ```bash
 cd ~/Hermes/apprank/app
-nvm use 20
 npm install
 createdb apprank 2>/dev/null; createdb apprank_test 2>/dev/null
 psql -d apprank -f supabase/migrations/0001_create_listings.sql -f supabase/migrations/0002_agent_first_catalog.sql -f supabase/migrations/0003_feedback.sql -f supabase/migrations/0004_invite_codes_and_keys.sql
@@ -40,13 +40,9 @@ DATABASE_URL_TEST=postgres://localhost:5432/apprank_test npm test
 
 ## Deploy
 ```bash
-cd ~/Hermes/apprank/app && nvm use 20
+cd ~/Hermes/apprank/app
 vercel --prod
 ```
-
-## Open decisions
-1. Terminal spacing — still iterating
-2. `rundocket.xyz` MX — no email set up yet
 
 ## File map
 | File | What |
@@ -60,17 +56,14 @@ vercel --prod
 | `apps/web/app/api/mcp-keys/register/route.ts` | register API |
 | `apps/web/app/api/admin/invite-codes/route.ts` | admin codes |
 | `apps/web/app/api/admin/mcp-keys/route.ts` | admin keys |
-| `packages/mcp/src/server.ts` | 9 MCP tools |
+| `packages/mcp/src/server.ts` | 10 MCP tools |
 | `packages/mcp/src/auth.ts` | key-lookup + scope check |
 | `packages/core/src/access.ts` | store + validation |
 | `apps/web/lib/copy.ts` | all user-facing copy |
 | `apps/web/app/globals.css` | design tokens |
 | `supabase/migrations/0004_invite_codes_and_keys.sql` | invite codes + keys schema |
-| `docs/PER-IDENTITY-KEYS.md` | per-identity keys plan |
+| `docs/PER-IDENTITY-KEYS.md` | per-identity keys spec |
 | `docs/ADMIN.md` | admin key location + access |
-| `design-sketches/admin.html` | admin UI mockup |
-| `design-sketches/mcp-setup.html` | MCP docs mockup |
-| `design-sketches/register.html` | register mockup |
 
 ## Don't
 - Re-explain the product

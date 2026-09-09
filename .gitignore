@@ -11,7 +11,7 @@ out/
 coverage/
 .vercel/
 supabase/.temp/
-.vercel
 .env*
 docs/CASE-STUDY.md
 docs/SOCIAL-CONTENT.md
+content/
