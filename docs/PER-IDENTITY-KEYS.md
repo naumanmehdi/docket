@@ -237,10 +237,15 @@ All admin endpoints check for your master key (`MCP_API_KEY` or `MCP_ADMIN_KEY`)
 - **Before:** Simple. You own the key, hand it out. No signup, no DB table, zero friction.
 - **After:** Users self-serve, but you now have a key table to manage, a registration endpoint to secure, and scope logic to maintain. Auth path is now a DB query per request (fast with index on `key_hash`, but not free).
 
-## Decision needed
-- Build per-identity keys (B) or leave as-is (A)?
-- If B, invite codes (C) or open registration?
-- Email verification needed, or skip for $0?
+## Decision (Sep 09 2026)
+- **Per-identity keys: YES** (Option B, invite-code-gated = C hybrid). Built and deployed.
+- **Owner verification: NONE at launch.** Invite code IS the trust signal — you hand codes to real people, that's the verification. Owner field is an audit label only, not an identity claim. Format validation only (email or `@handle` regex).
+- **Future fix (tracked):** Add email magic-link verification (Resend free tier) if impersonation becomes a problem. See "Future fixes" below.
+
+## Future fixes / additions (tracked here)
+1. **Owner verification** — email magic link (Resend free = 100/day) or X/GitHub OAuth to prove ownership of handle/email before issuing key. Currently anyone can register as `owner: "naumanmehdi"` with no proof.
+2. **Admin email alerts** — notify owner on key creation / high usage (requires email infra).
+3. **Rate-limit dashboard** — surface per-key usage anomalies in admin UI.
 
 ## Analytics (recommended, $0)
 
