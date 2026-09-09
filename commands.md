@@ -1,74 +1,47 @@
-# docket — quick commands
+# docket — new session handoff
 
-Copy-paste blocks for local work and deploy. Assumes macOS, nvm, Node 20, local Postgres.
+Start here: `docs/RESUME.md`  
+Admin key: `docs/ADMIN.md`
 
----
-
-## Setup (first time or after clone)
-
+## Start command
 ```bash
-cd ~/Hermes/apprank/app
-nvm use 20
-npm install
-createdb apprank 2>/dev/null; createdb apprank_test 2>/dev/null
-psql -d apprank -f supabase/migrations/0001_create_listings.sql -f supabase/migrations/0002_agent_first_catalog.sql -f supabase/migrations/0003_feedback.sql
-psql -d apprank_test -f supabase/migrations/0001_create_listings.sql -f supabase/migrations/0002_agent_first_catalog.sql -f supabase/migrations/0003_feedback.sql
-DATABASE_URL=postgres://localhost:5432/apprank node scripts/seed.mjs
+cd ~/Hermes/apprank/app && nvm use 20 && git checkout main && git pull origin main
 ```
 
----
-
-## Run locally
-
+## Local dev
 ```bash
-# Terminal 1 — MCP server (port 3001)
-DATABASE_URL=postgres://localhost:5432/apprank MCP_API_KEY=dev-key npm run start --workspace @docket/mcp
-
-# Terminal 2 — Web app (port 3000)
 DATABASE_URL=postgres://localhost:5432/apprank npm run dev --workspace @docket/web
 ```
 
-Then open `http://localhost:3000`.
-
----
-
 ## Tests
-
 ```bash
 DATABASE_URL_TEST=postgres://localhost:5432/apprank_test npm test
 ```
 
----
-
-## Build + deploy (production)
-
+## Staging deploy
 ```bash
-cd ~/Hermes/apprank/app
-nvm use 20
-vercel --prod
+cd ~/Hermes/apprank/app && nvm use 20 && vercel
 ```
 
-Live at `https://rundocket.xyz`.
-
----
-
-## Git (standard workflow)
-
+## Production deploy (only after explicit approval)
 ```bash
-git status
-git add <files>
-git commit -m "msg"
-git push origin main
+cd ~/Hermes/apprank/app && nvm use 20 && vercel --prod
 ```
 
-Branch is `main`. Don't rename DB/folder `apprank`.
+## Current state
+- `/mcp-docs` and `/register` are live in code
+- Favicon + “MCP” wording done
+- Admin back-office committed
+- Staging/production deploy not done yet
 
----
+## What to do next
+1. Read `docs/RESUME.md`
+2. Deploy to staging, get user approval
+3. Finish `/connect` cleanup → `/mcp-docs`
+4. Admin E2E verification
+5. Rate-limiting + usage logging (see `docs/PER-IDENTITY-KEYS.md`)
 
-## Don't commit
-
-- `.env*` files (secrets)
-- `docs/CASE-STUDY.md` (local/private)
-- `docs/WORKSTREAMS.md` (local/private)
-- `docs/DESIGN-VISION.md` (local/private)
-- `content/*.md` (local/private)
+## Rules
+- Don’t rename DB `apprank`
+- Don’t commit secrets
+- Don’t deploy to production unless explicitly approved
