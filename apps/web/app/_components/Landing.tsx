@@ -142,12 +142,15 @@ function RegisterForm({ onDone }: { onDone: () => void }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.errors?.[0] ?? "Registration failed.");
       setResult(data as Result);
-      onDone();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Registration failed.");
     } finally {
       setBusy(false);
     }
+  };
+
+  const close = () => {
+    onDone();
   };
 
   const copyKey = async () => {
@@ -226,7 +229,7 @@ function RegisterForm({ onDone }: { onDone: () => void }) {
               <br />
               <span className="mono">Authorization: Bearer {result.plaintext}</span>
             </div>
-            <button className="btn" style={{marginTop:14}} onClick={onDone}>Close</button>
+            <button className="btn" style={{marginTop:14}} onClick={close}>Close</button>
           </div>
         )}
       </div>
