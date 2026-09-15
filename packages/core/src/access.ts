@@ -65,6 +65,10 @@ export interface AccessStore {
   markKeyUsed(id: string): Promise<void>;
   listMcpKeys(): Promise<McpKey[]>;
   revokeKey(id: string): Promise<boolean>;
+  /* user key management */
+  listKeysForOwner(owner: string): Promise<McpKey[]>;
+  revokeUserKey(keyId: string, owner: string): Promise<{ ok: boolean; error?: string }>;
+  regenerateUserKey(keyId: string, owner: string): Promise<IssueResult>;
   /* per-key rate limiting */
   consumeRate(keyId: string, limitPerHour: number): Promise<RateDecision>;
 }
@@ -268,6 +272,55 @@ export function createAccessStore(pool: pg.Pool): AccessStore {
     return (rowCount ?? 0) > 0;
   };
 
+  const listKeysForOwner = async (owner: string): Promise<McpKey[]> => {
+    const { rows } = await pool.query(
+      `select k.*, c.code as invite_code
+       from mcp_keys k
+       left join invite_codes c on c.id = k.invite_code_id
+       where k.owner = $1
+       order by k.created_at desc`,
+      [owner]
+    );
+    return rows.map(mapKey);
+  };
+
+  const revokeUserKey = async (keyId: string, owner: string): Promise<{ ok: boolean; error?: string }> => {
+    const { rows } = await pool.query(
+      `select id from mcp_keys where id = $1 and owner = $2`,
+      [keyId, owner]
+    );
+    if (!rows[0]) return { ok: false, error: "key not found" };
+    await pool.query(`update mcp_keys set revoked = true where id = $1`, [keyId]);
+    return { ok: true };
+  };
+
+  const regenerateUserKey = async (keyId: string, owner: string): Promise<IssueResult> => {
+    const { rows } = await pool.query(
+      `select id, scopes from mcp_keys where id = $1 and owner = $2`,
+      [keyId, owner]
+    );
+    if (!rows[0]) return { ok: false, error: "key not found" };
+    const scopes = rows[0].scopes;
+    const secret = generateKeySecret();
+    const hash = hashKeySecret(secret);
+    const client = await pool.connect();
+    try {
+      await client.query("begin");
+      await client.query(`update mcp_keys set revoked = true where id = $1`, [keyId]);
+      const { rows: newRows } = await client.query(
+        `insert into mcp_keys (key_hash, owner, scopes) values ($1, $2, $3) returning *`,
+        [hash, owner, scopes]
+      );
+      await client.query("commit");
+      return { ok: true, key: mapKey(newRows[0]), plaintext: secret };
+    } catch (err) {
+      await client.query("rollback");
+      return { ok: false, error: "unable to generate new key" };
+    } finally {
+      client.release();
+    }
+  };
+
   const consumeRate = async (keyId: string, limitPerHour: number): Promise<RateDecision> => {
     const cap = Math.max(1, Math.trunc(limitPerHour));
     const { rows } = await pool.query(
@@ -293,6 +346,9 @@ export function createAccessStore(pool: pg.Pool): AccessStore {
     markKeyUsed,
     listMcpKeys,
     revokeKey,
+    listKeysForOwner,
+    revokeUserKey,
+    regenerateUserKey,
     consumeRate,
   };
 }

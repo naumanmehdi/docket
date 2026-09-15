@@ -97,6 +97,8 @@ export interface Store {
     source?: "web" | "mcp";
   }): Promise<Feedback>;
   topFeedback(opts?: { limit?: number }): Promise<TopAsk[]>;
+  listMyListings(author: string): Promise<Listing[]>;
+  listMyFeedback(contact: string): Promise<Feedback[]>;
 }
 
 const ROW_SELECT = `select id, kind, name, tagline, description, url, repo_url, category,
@@ -337,6 +339,25 @@ export function createStore(pool: pg.Pool): Store {
     return rows.map(mapListing);
   };
 
+  const listMyListings = async (author: string): Promise<Listing[]> => {
+    const { rows } = await pool.query(
+      `select id, kind, name, tagline, description, url, repo_url, category,
+       x_handle, author, author_contact, status, spotlighted,
+       claim_state, claimed_by, claimed_at, progress_note, build_url, built_at, created_at
+       from listings where author = $1 order by created_at desc limit 50`,
+      [author]
+    );
+    return rows.map(mapListing);
+  };
+
+  const listMyFeedback = async (contact: string): Promise<Feedback[]> => {
+    const { rows } = await pool.query(
+      `select * from feedback where contact = $1 order by created_at desc limit 50`,
+      [contact]
+    );
+    return rows.map(mapFeedback);
+  };
+
   const submitFeedback = async (input: {
     message: string;
     kind?: FeedbackKind;
@@ -369,6 +390,8 @@ export function createStore(pool: pg.Pool): Store {
     updateClaim,
     listIdeaActivity,
     listMyIdeas,
+    listMyListings,
+    listMyFeedback,
     submitFeedback,
     topFeedback,
   };
