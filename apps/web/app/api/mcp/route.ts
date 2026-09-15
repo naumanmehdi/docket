@@ -23,7 +23,14 @@ export const dynamic = "force-dynamic";
  */
 
 function unauthorized(): Response {
-  return Response.json({ error: "unauthorized" }, { status: 401 });
+  return Response.json(
+    {
+      error: "unauthorized",
+      message: "Your request needs an API key. Get one at https://rundocket.xyz/register — redeem your invite code, then send it as: Authorization: Bearer <your-key>",
+      setup_docs: "https://rundocket.xyz/mcp-docs",
+    },
+    { status: 401 }
+  );
 }
 
 function rateLimited(): Response {

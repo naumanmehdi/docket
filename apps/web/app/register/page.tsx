@@ -115,11 +115,16 @@ export default function RegisterPage() {
                 </div>
               </div>
               <div className="warn">
-                <b>Example client config:</b>
+                <b>Next: add this to your agent's MCP config.</b>
                 <br />
-                <span className="mono">Authorization: Bearer {result.plaintext}</span>
+                Copy the block below and paste it into your agent's MCP server settings:
+                <pre style={{margin:"8px 0 0", background:"var(--paper)", border:"1px solid var(--hair)", borderRadius:"8px", padding:"10px 12px", fontSize:"12px", overflowX:"auto", lineHeight:1.5}}>{`mcp_servers:
+              docket:
+              url: https://rundocket.xyz/mcp
+              headers:
+              Authorization: Bearer ${result.plaintext}`}</pre>
+                <a className="btn" style={{marginTop:14, display:'inline-flex', justifyContent:'center', textDecoration:'none'}} href="/mcp-docs">Full setup guide →</a>
               </div>
-              <a className="btn" style={{marginTop:14, display:'inline-flex', justifyContent:'center', textDecoration:'none'}} href="/">Close</a>
             </div>
           )}
         </div>
