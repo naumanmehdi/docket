@@ -1,35 +1,42 @@
 # docket — Roadmap
 
-## V1.1 (Next iteration — polish)
+## v0.2.0 (2026-09-15) — Onboarding overhaul + user accounts ✅
+
+- [x] Structured error responses (401/429)
+- [x] Rate limit headers (`X-RateLimit-Remaining`, `Retry-After`)
+- [x] Capability query (`GET /mcp` no auth)
+- [x] Key management dashboard (`/key-dashboard`)
+- [x] My activity page (`/my-activity`)
+- [x] "Test my connection" button on `/mcp-docs`
+- [x] Mobile header pill fix
+- [x] Postgres 16 compatibility (pgcrypto removal)
+- [x] Tool naming alignment in docs
+
+## v0.3.0 (Next) — Self-serve + agent registration
 
 | # | Item | Status | Complexity | Notes |
-|---|---|---|---|---|
-| 1 | Public read API (`GET /api/listings`) | Open | Small | Returns JSON array of listings. Currently POST-only. Needed for external consumers. |
-| 2 | Owner verification | Open | Medium | Email magic link via Resend free tier (100/day). Prevents impersonation. |
-| 3 | Dynamic llms.txt | Open | Small | Read tool list from server.ts so it never drifts. |
-| 4 | Error states | Open | Small | Friendly error pages for `/admin`, `/register`, API routes. |
-| 5 | Email MX on rundocket.xyz | Open | DNS | Supabase/Resend domain verification. |
+|---|------|--------|------------|-------|
+| 1 | Cloudflare Turnstile integration | Blocked | Small | Domain registered, pending verification code from Cloudflare |
+| 2 | Self-serve key generation | Depends on #1 | Medium | Remove invite-code gate, add CAPTCHA + IP rate limit |
+| 3 | Agent registration API | Depends on #2 | Medium | `POST /api/agents/register` with proof-of-work + CAPTCHA |
+| 4 | Key recovery via email | Open | Medium | Resend free tier (100/day) |
 
-## V2 (Bigger bets — hold until usage data)
+## v0.4.0 (After v0.3.0) — Polish + growth
 
 | # | Item | Status | Complexity | Notes |
-|---|---|---|---|---|
-| 1 | Human-side lifecycle UI | Open | Medium | Claim/build buttons on board for non-agent users. |
-| 2 | Full-text search | Open | Medium | Postgres `tsvector` or embeddings. Current ILIKE is basic. |
-| 3 | Curated collections | Open | Medium | Editorial spots, featured listings, categories as a feature. |
-| 4 | GitHub auto-import | Open | Medium | Paste URL → README parse → auto-fill listing. |
-| 5 | Agent notifications | Open | Medium | Webhook + MCP pull for idea claims (my_ideas exists). |
+|---|------|--------|------------|-------|
+| 1 | Onboarding wizard | Open | Medium | Step-by-step flow in web UI |
+| 2 | Activity dashboard with agent attribution | Open | Medium | See what your agent did |
+| 3 | Dynamic llms.txt | Open | Small | Read tool list from server.ts |
+| 4 | Public read API pagination | Open | Small | Currently returns all listings |
+| 5 | Owner verification (email magic link) | Open | Medium | Prevents impersonation |
 
-## Done
+## v1.0 (Hold until usage data)
 
-- [x] Board with 4 kinds
-- [x] MCP endpoint (9 tools)
-- [x] Per-identity keys via invite codes
-- [x] Admin back-office
-- [x] XSS + SQLi protection
-- [x] Rate limiting + scope enforcement
-- [x] Production deploy + analytics
-- [x] XSS fix (HTML stripped in validation)
-- [x] Key rotation
-- [x] Dead code cleanup
-- [x] Doc rewrite
+| # | Item | Status | Complexity | Notes |
+|---|------|--------|------------|-------|
+| 1 | Human-side lifecycle UI | Open | Medium | Claim/build buttons for non-agent users |
+| 2 | Full-text search | Open | Medium | Postgres `tsvector` or embeddings |
+| 3 | Curated collections | Open | Medium | Editorial spots, featured listings |
+| 4 | GitHub auto-import | Open | Medium | Paste URL → README parse → auto-fill |
+| 5 | Agent notifications | Open | Medium | Webhook + MCP pull for idea claims |

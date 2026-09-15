@@ -21,6 +21,8 @@
 | File | What it's for |
 |---|---|
 | `RESUME.md` | **Live handoff** — current state, open items, how to run |
+| `CHANGELOG.md` | **Version history** — v0.1.0 → v0.2.0, every commit documented |
+| `RELEASE-v0.2.0.md` | **v0.2.0 release notes** — shareable summary of what shipped |
 | `ARCHITECTURE.md` | Engineering orientation — layers, client/server rule, data model, flows, run steps |
 | `PRODUCTION-CHECKLIST.md` | Production readiness checklist |
 | `PER-IDENTITY-KEYS.md` | Per-identity MCP keys spec |
