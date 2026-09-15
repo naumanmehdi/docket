@@ -212,6 +212,9 @@ function RegisterForm({ onDone }: { onDone: () => void }) {
             <button className="btn" type="submit" disabled={busy || !code.trim() || !owner.trim()}>
               {busy ? "issuing…" : "Get my key"}
             </button>
+            <div className="note" style={{marginTop:12, fontSize:"12px", color:"var(--mut)", lineHeight:1.5}}>
+              💡 No invite code? They're handed out in batches. Keep an eye on <a href="https://x.com/NaumanMehdi" style={{color:"var(--ember)", textDecoration:"none"}}>@NaumanMehdi</a> for drops.
+            </div>
           </form>
         ) : (
           <div>
