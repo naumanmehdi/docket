@@ -1,13 +1,55 @@
 "use client";
-// docket /mcp-docs — MCP setup guide.
+// docket /mcp-docs — MCP setup guide + connection tester.
 // ELI5 style. Step-by-step. Copy-paste ready.
-// The existing mcp-docs page had wrong config structures — this rewrites it clean.
 
+import { useState } from "react";
 import { SITE } from "@/lib/site";
 
 const mcpUrl = `https://${SITE.domain}/mcp`;
 
 export default function MCPDocsPage() {
+  const [testKey, setTestKey] = useState("");
+  const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
+  const [testBusy, setTestBusy] = useState(false);
+
+  const testConnection = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setTestBusy(true);
+    setTestResult(null);
+    try {
+      const res = await fetch(mcpUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json, text/event-stream",
+          "Authorization": `Bearer ${testKey.trim()}`,
+        },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: 1,
+          method: "tools/list",
+          params: {},
+        }),
+      });
+      const text = await res.text();
+      if (res.ok) {
+        const data = JSON.parse(text);
+        const tools = data?.result?.tools ?? [];
+        setTestResult({ ok: true, message: `✓ Connection works! ${tools.length} tools discovered.` });
+      } else if (res.status === 401) {
+        setTestResult({ ok: false, message: "✗ Invalid key. Check for typos or get a fresh one at /register." });
+      } else if (res.status === 429) {
+        setTestResult({ ok: false, message: "⏳ Rate limited. Wait an hour and try again." });
+      } else {
+        setTestResult({ ok: false, message: `✗ Error ${res.status}: ${text.slice(0, 200)}` });
+      }
+    } catch (err) {
+      setTestResult({ ok: false, message: "✗ Network error. Check your internet connection." });
+    } finally {
+      setTestBusy(false);
+    }
+  };
+
   return (
     <div className="mcp-docs">
       <style>{`
@@ -30,8 +72,14 @@ export default function MCPDocsPage() {
         .mcp-docs .endpoint .label { font-size:11px; color:var(--mut); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px; }
         .mcp-docs .endpoint code { font-size:13px; word-break:break-all; }
         .mcp-docs .note { margin-top:8px; font-size:12px; color:var(--ember-deep); background:rgba(189,95,47,.08); border-radius:8px; padding:8px 10px; line-height:1.4; }
-        .mcp-docs .copy-btn { margin-top:10px; background:var(--ink); color:var(--paper); border:none; border-radius:8px; padding:8px 14px; font-weight:500; cursor:pointer; font-size:12px; }
-        .mcp-docs .copy-btn:hover { background:var(--ember); color:#fff6ec; }
+        .mcp-docs .test-form { margin-top:16px; display:flex; gap:10px; }
+        .mcp-docs .test-form input { flex:1; background:var(--paper); border:1px solid var(--hair); border-radius:10px; padding:11px 14px; font-size:13px; color:var(--ink); outline:none; font-family:inherit; }
+        .mcp-docs .test-form input:focus { border-color:var(--ember); }
+        .mcp-docs .test-form button { background:var(--ember); color:#fff6ec; border:none; border-radius:10px; padding:11px 18px; font-weight:600; cursor:pointer; font-size:13px; white-space:nowrap; }
+        .mcp-docs .test-form button:disabled { opacity:.5; cursor:default; }
+        .mcp-docs .test-result { margin-top:12px; border-radius:10px; padding:12px 14px; font-size:13px; line-height:1.5; }
+        .mcp-docs .test-result.ok { background:rgba(217,116,63,.1); color:var(--ember-deep); }
+        .mcp-docs .test-result.err { background:rgba(189,95,47,.12); color:var(--ember-deep); }
       `}</style>
 
       <div className="topbar">
@@ -90,18 +138,32 @@ export default function MCPDocsPage() {
 }`}</pre>
 
           <h3 style={{margin:"16px 0 6px", fontSize:"13px", fontWeight:600}}>Other MCP clients</h3>
-          <p>Any client that supports Streamable HTTP works. Set the URL and add the header <code>Authorization: Bearer dk_...</code>.</p>
+          <p>Any client that supports Streamable HTTP works. Set the URL and add the header <code>Authorization: Bearer dk_...</code></p>
         </div>
 
-        {/* Step 3: Restart and verify */}
+        {/* Step 3: Test connection */}
         <div className="step">
           <div className="step-head">
             <div className="step-num">3</div>
-            <h2>Restart and verify</h2>
+            <h2>Test your connection</h2>
           </div>
-          <p>After saving the config, restart your agent. It should now see docket's tools: <code>mcp__docket__publish</code>, <code>mcp__docket__search</code>, <code>mcp__docket__get_listing</code>, <code>mcp__docket__claim_idea</code>, <code>mcp__docket__feedback</code>, and more.</p>
-          <pre>{`# In Hermes, restart your session and run:
-/hermes mcp list   # should show docket with tools discovered`}</pre>
+          <p>Paste your key here to verify it works before connecting your agent:</p>
+          <form onSubmit={testConnection} className="test-form">
+            <input
+              value={testKey}
+              onChange={(e) => setTestKey(e.target.value)}
+              placeholder="dk_..."
+              autoComplete="off"
+            />
+            <button type="submit" disabled={testBusy || !testKey.trim()}>
+              {testBusy ? "testing…" : "Test key"}
+            </button>
+          </form>
+          {testResult && (
+            <div className={`test-result ${testResult.ok ? "ok" : "err"}`}>
+              {testResult.message}
+            </div>
+          )}
         </div>
 
         <div className="endpoint">
