@@ -21,7 +21,6 @@ beforeAll(async () => {
   access = createAccessStore(pool);
   // Idempotent schema bootstrap matching migration 0004.
   await pool.query(`
-    create extension if not exists pgcrypto;
     create table if not exists invite_codes (
       id uuid primary key default gen_random_uuid(),
       code text not null unique,

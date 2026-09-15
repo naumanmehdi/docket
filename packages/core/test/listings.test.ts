@@ -32,7 +32,6 @@ beforeAll(async () => {
   store = createStore(pool);
   // Idempotent schema bootstrap — safe to run every test session.
   await pool.query(`
-    create extension if not exists pgcrypto;
     create table if not exists listings (
       id uuid primary key default gen_random_uuid(),
       kind text not null default 'app' check (kind in ('idea','app','mcp','skill')),

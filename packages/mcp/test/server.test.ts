@@ -34,7 +34,6 @@ beforeAll(async () => {
   pool = new Pool({ connectionString: TEST_URL });
   store = createStore(pool);
   await pool.query(`
-    create extension if not exists pgcrypto;
     create table if not exists listings (
       id uuid primary key default gen_random_uuid(),
       kind text not null default 'app' check (kind in ('idea','app','mcp','skill')),
