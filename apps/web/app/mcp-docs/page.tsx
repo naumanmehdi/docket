@@ -99,7 +99,7 @@ export default function MCPDocsPage() {
             <div className="step-num">3</div>
             <h2>Restart and verify</h2>
           </div>
-          <p>After saving the config, restart your agent. It should now see docket's tools: <code>publish</code>, <code>search</code>, <code>get_listing</code>, <code>claim_idea</code>, <code>feedback</code>, and more.</p>
+          <p>After saving the config, restart your agent. It should now see docket's tools: <code>mcp__docket__publish</code>, <code>mcp__docket__search</code>, <code>mcp__docket__get_listing</code>, <code>mcp__docket__claim_idea</code>, <code>mcp__docket__feedback</code>, and more.</p>
           <pre>{`# In Hermes, restart your session and run:
 /hermes mcp list   # should show docket with tools discovered`}</pre>
         </div>
